@@ -39,9 +39,9 @@ export class FormdataInterceptor implements NestInterceptor {
     next: CallHandler
   ): Promise<Observable<any>> {
     const {
-      prefixDirectory,
+      // prefixDirectory,
       customFileName,
-      customDirectory,
+      // customDirectory,
       fileSaver = new DefaultFileSaver(),
     } = this.fileOptions || {};
     const ctx = context.switchToHttp();
@@ -50,16 +50,16 @@ export class FormdataInterceptor implements NestInterceptor {
 
     if (
       contentType &&
-      contentType.includes("multipart/form-data") &&
-      prefixDirectory
+      contentType.includes("multipart/form-data")
+      // prefixDirectory
     ) {
       return this.handleMultipartFormData(
         context,
         next,
         request,
-        prefixDirectory,
+        // prefixDirectory,
         customFileName,
-        customDirectory,
+        // customDirectory,
         fileSaver
       );
     }
@@ -81,15 +81,15 @@ export class FormdataInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
     request: Request,
-    prefixDirectory: string,
+    // prefixDirectory: string,
     customFileName?: (
       context: ExecutionContext,
       originalFileName: string
     ) => Promise<string> | string,
-    customDirectory?: (
-      context: ExecutionContext,
-      originalDirectory: string
-    ) => Promise<string> | string,
+    // customDirectory?: (
+    //   context: ExecutionContext,
+    //   originalDirectory: string
+    // ) => Promise<string> | string,
     fileSaver?: IFileSaver
   ): Promise<Observable<any>> {
     return new Observable((observer) => {
@@ -117,16 +117,16 @@ export class FormdataInterceptor implements NestInterceptor {
             : fileNameOnly;
           const fullFileName = `${finalFileName}.${fileExtension}`;
 
-          const directoryPath = customDirectory
-            ? await customDirectory(context, prefixDirectory)
-            : prefixDirectory;
+          // const directoryPath = customDirectory
+          //   ? await customDirectory(context, prefixDirectory)
+          //   : prefixDirectory;
 
-          const filePath = path
-            .join(directoryPath, fullFileName)
-            .replace(/\\/g, "/");
+          // const filePath = path
+          //   .join(directoryPath, fullFileName)
+          //   .replace(/\\/g, "/");
 
           FileData.prototype.save = function (this: FileData) {
-            return fileSaver.save(this);
+            return fileSaver.save(this, context);
           };
 
           const fileData = new FileData(
@@ -137,7 +137,7 @@ export class FormdataInterceptor implements NestInterceptor {
             filename.mimeType as MimeType,
             fileExtension,
             fileSize,
-            filePath,
+            // filePath,
             Buffer.concat(fileBuffer)
           );
 
