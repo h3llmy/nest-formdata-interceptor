@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "nest js formdata interceptor",
   "main": "dist/index.js",
+  "author": "h3llmy",
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "test": "jest --watchAll"
@@ -19,8 +21,6 @@
       "**/*.test.ts"
     ]
   },
-  "author": "h3llmy",
-  "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.0",
