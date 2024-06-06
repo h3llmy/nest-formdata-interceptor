@@ -1,12 +1,11 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
-name: Node.js Package
+name: Publish nestjs-fromdat NPM Package
 
 on:
   push:
     branches:
       - master
+  release:
+    types: [created]
 
 jobs:
   test:
@@ -16,18 +15,23 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm install && npm run test
+          cache: "npm"
+      - run: npm install
+      - run: npm test
 
   publish-npm:
     needs: test
     runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'created'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm install --omit=dev && npm run build
+          cache: "npm"
+      - run: npm install
+      - run: npm run build
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
