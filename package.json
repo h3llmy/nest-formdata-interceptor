@@ -4,6 +4,9 @@
   "description": "nest js formdata interceptor",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "author": "h3llmy",
   "repository": {
     "type": "git",
