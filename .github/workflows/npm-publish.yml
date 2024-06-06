@@ -10,42 +10,26 @@ on:
       - created
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 20
-          cache: "npm" # Enable caching for npm dependencies
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
+          node-version: 16
+      - run: npm install
+      - run: npm run test
 
   publish-npm:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 16
           registry-url: https://registry.npmjs.org/
-          cache: "npm"
-
-      - name: Build the package
-        run: npm install && npm run build
-
-      - name: Publish to npm
-        run: npm publish
+      - run: npm run build
+      - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
