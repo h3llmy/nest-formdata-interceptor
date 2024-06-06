@@ -6,7 +6,7 @@
 
 ### Installation
 
-To install `nestjs-formdata-interceptor` using npm (COMING SOON):
+To install `nestjs-formdata-interceptor` using npm:
 
 ```sh
 npm install nestjs-formdata-interceptor
