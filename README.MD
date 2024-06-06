@@ -9,7 +9,7 @@
 To install `nestjs-formdata` using npm (COMING SOON):
 
 ```sh
-$ npm install nestjs-formdata
+npm install nestjs-formdata
 ```
 
 ### Usage
@@ -160,4 +160,4 @@ export class AppController {
 }
 ```
 
-With this setup, nestjs-formdata will manage multipart/form-data requests efficiently, allowing for structured handling of file uploads in your NestJS application.
+With this setup, `nestjs-formdata` will manage multipart/form-data requests efficiently, allowing for structured handling of file uploads in your NestJS application.
