@@ -1,10 +1,15 @@
 {
   "name": "nestjs-formdata",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "nest js formdata interceptor",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "h3llmy",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h3llmy/nest-formdata.git"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "test": "jest --watchAll"
@@ -35,5 +40,19 @@
     "class-validator": "^0.14.1",
     "express": "^4.19.2",
     "rxjs": "^7.8.1"
-  }
+  },
+  "keywords": [
+    "nestjs",
+    "formdata",
+    "interceptor",
+    "form data",
+    "nestjs multipart",
+    "nestjs form data",
+    "nestjs form data interceptor",
+    "nestjs file upload",
+    "nestjs validate file",
+    "nestjs store file",
+    "file middleware",
+    "nestjs multipart/form-data"
+  ]
 }

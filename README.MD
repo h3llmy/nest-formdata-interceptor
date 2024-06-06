@@ -161,3 +161,7 @@ export class AppController {
 ```
 
 With this setup, `nestjs-formdata` will manage multipart/form-data requests efficiently, allowing for structured handling of file uploads in your NestJS application.
+
+## License
+
+[MIT](LICENSE)

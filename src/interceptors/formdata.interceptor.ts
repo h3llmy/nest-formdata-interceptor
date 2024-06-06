@@ -7,7 +7,6 @@ import {
 import { Observable } from "rxjs";
 import Busboy from "busboy";
 import { Request } from "express";
-import path from "path";
 import { DefaultFileSaver } from "../fileSaver/default.file-saver";
 import {
   FileData,

@@ -162,6 +162,8 @@ export enum MimeType {
   "audio/wav" = "audio/wav",
   "audio/webm" = "audio/webm",
   "audio/midi" = "audio/midi",
+  "text/plain" = "text/plain",
+  "text/html" = "text/html",
 }
 
 /**
