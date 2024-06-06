@@ -12,8 +12,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "test": "jest --watchAll",
-    "test:watch": "jest"
+    "test": "jest",
+    "test:watch": "jest --watchAll"
   },
   "jest": {
     "preset": "ts-jest",
