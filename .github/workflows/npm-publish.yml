@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 20
       - run: npm ci # Pre-install dependencies (optional)
-      - run: npm install path fs rxjs busboy express class-validator @types/node
+      - run: npm install path fs rxjs busboy express class-validator @types/node # Install missing dependencies and type definitions
       - run: npm run test
 
   publish-npm:
@@ -33,4 +33,4 @@ jobs:
       - run: npm run build
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
