@@ -1,6 +1,6 @@
 {
-  "name": "nestjs-formdata",
-  "version": "1.0.0",
+  "name": "nestjs-formdata-interceptor",
+  "version": "1.0.1",
   "description": "nest js formdata interceptor",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

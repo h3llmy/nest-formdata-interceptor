@@ -1,26 +1,29 @@
-# nestjs-formdata
+# nestjs-formdata-interceptor
 
-`nestjs-formdata` is a powerful library for NestJS that provides seamless interception and handling of multipart/form-data requests. This functionality is particularly beneficial for efficiently managing file uploads in your application. Note that this library is compatible only with the Express platform.
+`nestjs-formdata-interceptor` is a powerful library for NestJS that provides seamless interception and handling of multipart/form-data requests. This functionality is particularly beneficial for efficiently managing file uploads in your application. Note that this library is compatible only with the Express platform.
 
 ## Getting Started
 
 ### Installation
 
-To install `nestjs-formdata` using npm (COMING SOON):
+To install `nestjs-formdata-interceptor` using npm (COMING SOON):
 
 ```sh
-npm install nestjs-formdata
+npm install nestjs-formdata-interceptor
 ```
 
 ### Usage
 
-To use `nestjs-formdata`, import it into the main directory of your NestJS application and configure it as shown below:
+To use `nestjs-formdata-interceptor`, import it into the main directory of your NestJS application and configure it as shown below:
 
 ```ts
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
-import { FormdataInterceptor, DefaultFileSaver } from "nestjs-formdata";
+import {
+  FormdataInterceptor,
+  DefaultFileSaver,
+} from "nestjs-formdata-interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -61,7 +64,7 @@ The `customFileName` function allows you to generate custom file names for each 
 If you need custom file-saving logic, implement the IFileSaver interface. Here's an example:
 
 ```ts
-import { FileData, IFileSaver } from "nestjs-formdata";
+import { FileData, IFileSaver } from "nestjs-formdata-interceptor";
 import { ExecutionContext } from "@nestjs/common";
 
 export class CustomFileSaver implements IFileSaver {
@@ -81,7 +84,7 @@ Then, use your custom file saver in the interceptor configuration:
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
-import { FormdataInterceptor } from "nestjs-formdata";
+import { FormdataInterceptor } from "nestjs-formdata-interceptor";
 import { CustomFileSaver } from "path-to-your-file-saver";
 
 async function bootstrap() {
@@ -114,7 +117,7 @@ import {
   MaxFileSize,
   MimeType,
   MinFileSize,
-} from "nestjs-formdata";
+} from "nestjs-formdata-interceptor";
 
 export class CreateDto {
   @IsArray()
@@ -160,7 +163,7 @@ export class AppController {
 }
 ```
 
-With this setup, `nestjs-formdata` will manage multipart/form-data requests efficiently, allowing for structured handling of file uploads in your NestJS application.
+With this setup, `nestjs-formdata-interceptor` will manage multipart/form-data requests efficiently, allowing for structured handling of file uploads in your NestJS application.
 
 ## License
 
