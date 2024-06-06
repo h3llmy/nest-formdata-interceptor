@@ -17,7 +17,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-      - run: npm install
+      - run: npm ci # Pre-install dependencies (optional)
+      - run: npm install path fs rxjs busboy express class-validator @types/node
       - run: npm run test
 
   publish-npm:
