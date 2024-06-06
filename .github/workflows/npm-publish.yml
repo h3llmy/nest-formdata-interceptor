@@ -1,37 +1,55 @@
 name: Publish nestjs-fromdat NPM Package
 
+# This workflow triggers on push to master and on release creation
 on:
   push:
     branches:
       - master
   release:
-    types: [created]
+    types:
+      - created
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "npm"
-      - run: npm install
-      - run: npm test
+          cache: "npm" # Enable caching for npm dependencies
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
 
   publish-npm:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'created'
+    if: github.event_name == 'release' && github.event.action == 'created' # Only run on release creation
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
           cache: "npm"
-      - run: npm install
-      - run: npm run build
-      - run: npm publish
+
+      - name: Install dependencies (including devDependencies)
+        run: npm install
+
+      - name: Build the package
+        run: npm run build
+
+      - name: Publish to npm
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
