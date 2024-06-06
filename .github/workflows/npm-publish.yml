@@ -9,25 +9,26 @@ on:
       - master
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
+      - run: npm ci # Pre-install dependencies (optional)
+      - run: npm install path fs rxjs busboy express class-validator @types/node # Install missing dependencies and type definitions
       - run: npm run test
-
   publish-npm:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - run: npm run build
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+      - run: npm install tsc && npm run build
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
