@@ -30,8 +30,7 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com
-      - run: npm install tsc
-      - run: npm run build
+      - run: npm install tsc && npm run build
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
