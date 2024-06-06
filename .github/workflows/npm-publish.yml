@@ -16,8 +16,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-      - run: npm ci # Pre-install dependencies (optional)
-      - run: npm install path fs rxjs busboy express class-validator @types/node # Install missing dependencies and type definitions
+      - run: npm ci
       - run: npm run test
   publish-npm:
     needs: build
@@ -27,7 +26,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          registry-url: https://npm.pkg.github.com
+          registry-url: https://registry.npmjs.org/
       - run: npm install && npm run build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
