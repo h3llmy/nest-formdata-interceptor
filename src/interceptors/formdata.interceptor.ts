@@ -20,8 +20,6 @@ import {
  * Interceptor to handle file uploads using Busboy.
  */
 @Injectable()
-// TODO: change the prefixDirectory to fileSaver
-// TODO: return the filePath from save function
 export class FormdataInterceptor implements NestInterceptor {
   private readonly arrayRegexPattern: RegExp = /\[\]$/;
   private readonly nestedRegexPattern: RegExp = /[\[\]]/;
@@ -34,32 +32,22 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param next - The next call handler.
    * @returns An Observable that processes the file upload.
    */
-  async intercept(
+  public async intercept(
     context: ExecutionContext,
     next: CallHandler
   ): Promise<Observable<any>> {
-    const {
-      // prefixDirectory,
-      customFileName,
-      // customDirectory,
-      fileSaver = new DefaultFileSaver(),
-    } = this.fileOptions || {};
+    const { customFileName, fileSaver = new DefaultFileSaver() } =
+      this.fileOptions || {};
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
     const contentType = request.headers["content-type"];
 
-    if (
-      contentType &&
-      contentType.includes("multipart/form-data")
-      // prefixDirectory
-    ) {
+    if (contentType && contentType.includes("multipart/form-data")) {
       return this.handleMultipartFormData(
         context,
         next,
         request,
-        // prefixDirectory,
         customFileName,
-        // customDirectory,
         fileSaver
       );
     }
@@ -81,15 +69,10 @@ export class FormdataInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
     request: Request,
-    // prefixDirectory: string,
     customFileName?: (
       context: ExecutionContext,
       originalFileName: string
     ) => Promise<string> | string,
-    // customDirectory?: (
-    //   context: ExecutionContext,
-    //   originalDirectory: string
-    // ) => Promise<string> | string,
     fileSaver?: IFileSaver
   ): Promise<Observable<any>> {
     return new Observable((observer) => {
@@ -117,14 +100,6 @@ export class FormdataInterceptor implements NestInterceptor {
             : fileNameOnly;
           const fullFileName = `${finalFileName}.${fileExtension}`;
 
-          // const directoryPath = customDirectory
-          //   ? await customDirectory(context, prefixDirectory)
-          //   : prefixDirectory;
-
-          // const filePath = path
-          //   .join(directoryPath, fullFileName)
-          //   .replace(/\\/g, "/");
-
           FileData.prototype.save = function (this: FileData) {
             return fileSaver.save(this, context);
           };
@@ -137,7 +112,6 @@ export class FormdataInterceptor implements NestInterceptor {
             filename.mimeType as MimeType,
             fileExtension,
             fileSize,
-            // filePath,
             Buffer.concat(fileBuffer)
           );
 

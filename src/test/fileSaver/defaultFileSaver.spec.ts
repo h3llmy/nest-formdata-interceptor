@@ -1,80 +1,116 @@
-// import { DefaultFileSaver } from "../../fileSaver/default.file-saver";
-// import { FileData, MimeType } from "../../interfaces/file.interface";
-// import fs from "fs";
-// import path from "path";
+import { DefaultFileSaver } from "../../fileSaver/default.file-saver";
+import {
+  DefaultFileSaverOptions,
+  FileData,
+  MimeType,
+} from "../../interfaces/file.interface";
+import fs from "fs";
+import path from "path";
+import { ExecutionContext } from "@nestjs/common";
 
-// // Mock the fs module
-// jest.mock("fs");
+// Mock the fs module
+jest.mock("fs");
 
-// describe("DefaultFileSaver", () => {
-//   let fileSaver: DefaultFileSaver;
+describe("DefaultFileSaver", () => {
+  let fileSaver: DefaultFileSaver;
+  const mockPrefixDirectory = "./public";
+  const mockExecutionContext = {} as ExecutionContext;
 
-//   beforeEach(() => {
-//     fileSaver = new DefaultFileSaver();
-//   });
+  const mockFileData = new FileData(
+    "file.txt",
+    "file",
+    "file.txt",
+    "7bit",
+    MimeType["image/png"],
+    "txt",
+    100,
+    Buffer.from("Hello, world!")
+  );
 
-//   afterEach(() => {
-//     jest.clearAllMocks();
-//   });
+  beforeEach(() => {
+    const options: DefaultFileSaverOptions = {
+      prefixDirectory: mockPrefixDirectory,
+    };
+    fileSaver = new DefaultFileSaver(options);
+  });
 
-//   it("should create directory if it does not exist and save file", () => {
-//     const mockFilePath = "/some/path/file.txt";
-//     const mockFileData = new FileData(
-//       "file.txt",
-//       "file",
-//       "file.txt",
-//       "7bit",
-//       MimeType["image/png"],
-//       "txt",
-//       100,
-//       mockFilePath,
-//       Buffer.from("test")
-//     );
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//     // Mock implementations for fs functions
-//     (fs.existsSync as jest.Mock).mockReturnValue(false);
-//     (fs.mkdirSync as jest.Mock).mockReturnValue(undefined);
-//     (fs.writeFileSync as jest.Mock).mockReturnValue(undefined);
+  it("should create directory if it does not exist and save file", () => {
+    const mockFilePath = path
+      .join(mockPrefixDirectory, mockFileData.fileNameFull)
+      .replace(/\\/g, "/");
 
-//     const result = fileSaver.save(mockFileData);
+    // Mock implementations for fs functions
+    (fs.existsSync as jest.Mock).mockReturnValue(false);
+    (fs.mkdirSync as jest.Mock).mockReturnValue(undefined);
+    (fs.writeFileSync as jest.Mock).mockReturnValue(undefined);
 
-//     expect(fs.existsSync).toHaveBeenCalledWith(path.dirname(mockFilePath));
-//     expect(fs.mkdirSync).toHaveBeenCalledWith(path.dirname(mockFilePath), {
-//       recursive: true,
-//     });
-//     expect(fs.writeFileSync).toHaveBeenCalledWith(
-//       mockFilePath,
-//       mockFileData.buffer
-//     );
-//     expect(result).toBe(mockFilePath);
-//   });
+    const result = fileSaver.save(mockFileData, mockExecutionContext);
 
-//   it("should save file when directory already exists", () => {
-//     const mockFilePath = "/some/path/file.txt";
-//     const mockFileData = new FileData(
-//       "file.txt",
-//       "file",
-//       "file.txt",
-//       "7bit",
-//       MimeType["video/mp4"],
-//       "txt",
-//       100,
-//       mockFilePath,
-//       Buffer.from("test")
-//     );
+    expect(fs.existsSync).toHaveBeenCalledWith(mockPrefixDirectory);
+    expect(fs.mkdirSync).toHaveBeenCalledWith(mockPrefixDirectory, {
+      recursive: true,
+    });
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      mockFilePath,
+      mockFileData.buffer
+    );
+    expect(result).toBe(mockFilePath);
+  });
 
-//     // Mock implementations for fs functions
-//     (fs.existsSync as jest.Mock).mockReturnValue(true);
-//     (fs.writeFileSync as jest.Mock).mockReturnValue(undefined);
+  it("should save file when directory already exists", () => {
+    const mockFilePath = path
+      .join(mockPrefixDirectory, mockFileData.fileNameFull)
+      .replace(/\\/g, "/");
 
-//     const result = fileSaver.save(mockFileData);
+    // Mock implementations for fs functions
+    (fs.existsSync as jest.Mock).mockReturnValue(true);
+    (fs.writeFileSync as jest.Mock).mockReturnValue(undefined);
 
-//     expect(fs.existsSync).toHaveBeenCalledWith(path.dirname(mockFilePath));
-//     expect(fs.mkdirSync).not.toHaveBeenCalled();
-//     expect(fs.writeFileSync).toHaveBeenCalledWith(
-//       mockFilePath,
-//       mockFileData.buffer
-//     );
-//     expect(result).toBe(mockFilePath);
-//   });
-// });
+    const result = fileSaver.save(mockFileData, mockExecutionContext);
+
+    expect(fs.existsSync).toHaveBeenCalledWith(mockPrefixDirectory);
+    expect(fs.mkdirSync).not.toHaveBeenCalled();
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      mockFilePath,
+      mockFileData.buffer
+    );
+    expect(result).toBe(mockFilePath);
+  });
+
+  it("should use custom directory function if provided", () => {
+    const customDirectory = jest.fn().mockReturnValue("custom/dir");
+    const options: DefaultFileSaverOptions = {
+      prefixDirectory: mockPrefixDirectory,
+      customDirectory,
+    };
+    fileSaver = new DefaultFileSaver(options);
+    const mockFilePath = path
+      .join("custom/dir", mockFileData.fileNameFull)
+      .replace(/\\/g, "/");
+
+    // Mock implementations for fs functions
+    (fs.existsSync as jest.Mock).mockReturnValue(false);
+    (fs.mkdirSync as jest.Mock).mockReturnValue(undefined);
+    (fs.writeFileSync as jest.Mock).mockReturnValue(undefined);
+
+    const result = fileSaver.save(mockFileData, mockExecutionContext);
+
+    expect(customDirectory).toHaveBeenCalledWith(
+      mockExecutionContext,
+      mockPrefixDirectory
+    );
+    expect(fs.existsSync).toHaveBeenCalledWith("custom/dir");
+    expect(fs.mkdirSync).toHaveBeenCalledWith("custom/dir", {
+      recursive: true,
+    });
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      mockFilePath,
+      mockFileData.buffer
+    );
+    expect(result).toBe(mockFilePath);
+  });
+});

@@ -18,7 +18,7 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
    * @param args The validation arguments containing the constraints and options.
    * @returns A boolean indicating whether the mimetype matches the specified types.
    */
-  validate(value: FileData, args: ValidationArguments) {
+  public validate(value: FileData, args: ValidationArguments) {
     const [mimeType, option] = args.constraints as [
       (MimeType | string)[],
       ValidationOptions
@@ -36,7 +36,7 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
    * @param args The validation arguments containing the constraints and options.
    * @returns The default error message.
    */
-  defaultMessage(args: ValidationArguments) {
+  public defaultMessage(args: ValidationArguments) {
     const [mimeType, option] = args.constraints as [
       (MimeType | string)[],
       ValidationOptions

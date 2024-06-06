@@ -176,7 +176,6 @@ export class FileData {
     public mimetype: MimeType,
     public fileExtension: string,
     public fileSize: number,
-    // public filePath: string,
     public buffer: Buffer
   ) {}
 
@@ -184,7 +183,6 @@ export class FileData {
    * Saves the file data to the specified file path.
    */
   save(): string | Promise<string> {
-    // return this.filePath;
     return "";
   }
 }
@@ -197,14 +195,17 @@ export interface IFileSaver {
  * Options for customizing file upload behavior.
  */
 export interface IFileOptions {
-  // prefixDirectory?: string;
   customFileName?: (
     context: ExecutionContext,
     originalFileName: string
   ) => Promise<string> | string;
-  // customDirectory?: (
-  //   context: ExecutionContext,
-  //   originalDirectory: string
-  // ) => Promise<string> | string;
   fileSaver?: IFileSaver;
+}
+
+export interface DefaultFileSaverOptions {
+  prefixDirectory?: string;
+  customDirectory?: (
+    context: ExecutionContext,
+    originalDirectory: string
+  ) => string;
 }

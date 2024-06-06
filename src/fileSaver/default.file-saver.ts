@@ -1,5 +1,9 @@
 import path from "path";
-import { FileData, IFileSaver } from "../interfaces/file.interface";
+import {
+  DefaultFileSaverOptions,
+  FileData,
+  IFileSaver,
+} from "../interfaces/file.interface";
 import fs from "fs";
 import { ExecutionContext } from "@nestjs/common";
 
@@ -8,13 +12,10 @@ import { ExecutionContext } from "@nestjs/common";
  * This class is responsible for saving file data to the filesystem.
  */
 export class DefaultFileSaver implements IFileSaver {
-  constructor(
-    private readonly prefixDirectory: string = "public",
-    private readonly customDirectory?: (
-      context: ExecutionContext,
-      originalDirectory: string
-    ) => string
-  ) {}
+  constructor(private readonly options?: DefaultFileSaverOptions) {
+    this.options = this.options ?? {};
+    this.options.prefixDirectory = this.options?.prefixDirectory ?? "./public";
+  }
 
   /**
    * Saves the provided file data to the specified file path.
@@ -23,10 +24,10 @@ export class DefaultFileSaver implements IFileSaver {
    * @param fileData - The file data to save.
    * @returns The file path where the file was saved.
    */
-  save(fileData: FileData, context: ExecutionContext): string {
-    const directory = this.customDirectory
-      ? this.customDirectory(context, this.prefixDirectory)
-      : this.prefixDirectory;
+  public save(fileData: FileData, context: ExecutionContext): string {
+    const directory = this.options.customDirectory
+      ? this.options.customDirectory(context, this.options.prefixDirectory)
+      : this.options.prefixDirectory;
 
     const filePath = path
       .join(directory, fileData.fileNameFull)

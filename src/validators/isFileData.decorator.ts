@@ -18,7 +18,7 @@ class IsFileDataConstraint implements ValidatorConstraintInterface {
    * @param args - The validation arguments containing constraints and other metadata.
    * @returns `true` if the value is valid, otherwise `false`.
    */
-  validate(value: FileData, args: ValidationArguments) {
+  public validate(value: FileData, args: ValidationArguments) {
     const [option] = args.constraints as [ValidationOptions];
 
     if (option?.each && Array.isArray(value)) {
@@ -33,7 +33,7 @@ class IsFileDataConstraint implements ValidatorConstraintInterface {
    * @param args - The validation arguments containing constraints and other metadata.
    * @returns The default error message.
    */
-  defaultMessage(args: ValidationArguments) {
+  public defaultMessage(args: ValidationArguments) {
     const [option] = args.constraints as [ValidationOptions];
 
     if (option?.each) {

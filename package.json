@@ -1,10 +1,10 @@
 {
-  "name": "nest-formdata",
-  "version": "1.0.0",
+  "name": "nestjs-formdata",
+  "version": "0.0.2",
   "description": "nest js formdata interceptor",
   "main": "dist/index.js",
   "author": "h3llmy",
-  "license": "MIT",
+  "license": "ISC",
   "scripts": {
     "build": "tsc",
     "test": "jest --watchAll"

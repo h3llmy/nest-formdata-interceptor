@@ -18,7 +18,7 @@ class MinFileSizeConstraint implements ValidatorConstraintInterface {
    * @param args - The validation arguments containing constraints and other metadata.
    * @returns `true` if the file size is above the limit, otherwise `false`.
    */
-  validate(value: FileData, args: ValidationArguments) {
+  public validate(value: FileData, args: ValidationArguments) {
     const [minSize, options] = args.constraints as [number, ValidationOptions];
 
     if (options?.each && Array.isArray(value)) {
@@ -33,7 +33,7 @@ class MinFileSizeConstraint implements ValidatorConstraintInterface {
    * @param args - The validation arguments containing constraints and other metadata.
    * @returns The default error message.
    */
-  defaultMessage(args: ValidationArguments) {
+  public defaultMessage(args: ValidationArguments) {
     const [minSize] = args.constraints as [number];
 
     return `The file ${args.property} minimum file size is ${minSize} bytes`;
