@@ -20,7 +20,6 @@ jobs:
       - run: npm ci # Pre-install dependencies (optional)
       - run: npm install path fs rxjs busboy express class-validator @types/node # Install missing dependencies and type definitions
       - run: npm run test
-
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
