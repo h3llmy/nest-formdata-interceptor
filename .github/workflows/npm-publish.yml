@@ -42,11 +42,8 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "npm"
 
-      - name: Install dependencies (including devDependencies)
-        run: npm install
-
       - name: Build the package
-        run: npm run build
+        run: npm install && npm run build
 
       - name: Publish to npm
         run: npm publish
