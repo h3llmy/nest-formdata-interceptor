@@ -165,6 +165,12 @@ export class AppController {
 
 With this setup, `nestjs-formdata-interceptor` will manage multipart/form-data requests efficiently, allowing for structured handling of file uploads in your NestJS application.
 
+## Contributors
+
+<a href="https://github.com/h3llmy/nest-formdata/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=h3llmy/nest-formdata" />
+</a>
+
 ## License
 
 [MIT](LICENSE)

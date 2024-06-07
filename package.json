@@ -10,7 +10,7 @@
   "author": "h3llmy",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/h3llmy/nest-formdata.git"
+    "url": "git+https://github.com/h3llmy/nest-formdata-interceptor.git"
   },
   "license": "MIT",
   "scripts": {
@@ -42,6 +42,7 @@
     "busboy": "^1.6.0",
     "class-validator": "^0.14.1",
     "express": "^4.19.2",
+    "fastify": "^4.27.0",
     "rxjs": "^7.8.1"
   },
   "keywords": [
