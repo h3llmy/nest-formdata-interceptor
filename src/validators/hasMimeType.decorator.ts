@@ -1,4 +1,5 @@
-import { FileData, MimeType } from "../interfaces/file.interface";
+import { FileData } from "../classes/FileData";
+import { MimeType } from "../interfaces/file.interface";
 import {
   registerDecorator,
   ValidationArguments,

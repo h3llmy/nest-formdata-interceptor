@@ -1,7 +1,6 @@
 import { of } from "rxjs";
 import { FormdataInterceptor } from "../../interceptors/formdata.interceptor";
 import { CallHandler, ExecutionContext } from "@nestjs/common";
-import { Request } from "express";
 
 describe("FormdataInterceptor", () => {
   let interceptor: FormdataInterceptor;
@@ -10,7 +9,7 @@ describe("FormdataInterceptor", () => {
     headers: { "content-type": "multipart/form-data" },
     pipe: jest.fn(),
     body: {},
-  } as unknown as Request;
+  };
 
   const executionContext = {
     switchToHttp: jest.fn().mockReturnThis(),

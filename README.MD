@@ -1,6 +1,6 @@
 # nestjs-formdata-interceptor
 
-`nestjs-formdata-interceptor` is a powerful library for NestJS that provides seamless interception and handling of multipart/form-data requests. This functionality is particularly beneficial for efficiently managing file uploads in your application. Note that this library is compatible only with the Express platform.
+`nestjs-formdata-interceptor` is a powerful library for NestJS that provides seamless interception and handling of multipart/form-data requests. This functionality is particularly beneficial for efficiently managing file uploads in your application.
 
 ## Getting Started
 
@@ -47,6 +47,49 @@ async function bootstrap() {
 bootstrap();
 ```
 
+### Fastify
+
+need to install [@fastify/multipart](https://www.npmjs.com/package/@fastify/multipart) package.
+
+```ts
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from "@nestjs/platform-fastify";
+import fastifyMultipart from "@fastify/multipart";
+import {
+  DefaultFileSaver,
+  FormdataInterceptor,
+} from "nestjs-formdata-interceptor";
+
+async function bootstrap() {
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter()
+  );
+  app.register(fastifyMultipart);
+
+  app.useGlobalInterceptors(
+    new FormdataInterceptor({
+      customFileName(context, originalFileName) {
+        return `${Date.now()}-${originalFileName}`;
+      },
+      fileSaver: new DefaultFileSaver({
+        prefixDirectory: "./public",
+        customDirectory(context, originalDirectory) {
+          return originalDirectory;
+        },
+      }),
+    })
+  );
+
+  await app.listen(3000);
+}
+bootstrap();
+```
+
 ### Explanation
 
 #### 1. Custom File Name:
@@ -56,6 +99,7 @@ The `customFileName` function allows you to generate custom file names for each 
 #### 2. File Saver:
 
 - The `DefaultFileSaver` is used to define the directory where the files will be saved.
+
   - `prefixDirectory` specifies the root directory where all files will be saved.
   - `customDirectory` allows you to specify a custom sub-directory within the root directory. By default, it uses the original directory provided.
 
