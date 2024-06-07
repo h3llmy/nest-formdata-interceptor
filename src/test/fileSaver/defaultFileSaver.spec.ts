@@ -1,12 +1,12 @@
 import { DefaultFileSaver } from "../../fileSaver/default.file-saver";
 import {
   DefaultFileSaverOptions,
-  FileData,
   MimeType,
 } from "../../interfaces/file.interface";
 import fs from "fs";
 import path from "path";
 import { ExecutionContext } from "@nestjs/common";
+import { FileData } from "../../classes/FileData";
 
 // Mock the fs module
 jest.mock("fs");

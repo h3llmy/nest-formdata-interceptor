@@ -1,4 +1,4 @@
-import { FileData } from "../interfaces/file.interface";
+import { FileData } from "../classes/FileData";
 import {
   registerDecorator,
   ValidationArguments,

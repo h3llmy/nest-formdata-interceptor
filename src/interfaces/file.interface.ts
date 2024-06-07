@@ -1,5 +1,8 @@
 import { ExecutionContext } from "@nestjs/common";
-
+import { FileData } from "../classes/FileData";
+/**
+ * Enum for the mime types.
+ */
 export enum MimeType {
   "application/andrew-inset" = "application/andrew-inset",
   "application/applixware" = "application/applixware",
@@ -167,29 +170,15 @@ export enum MimeType {
 }
 
 /**
- * Represents the data for a file.
+ * Interface for saving file data.
  */
-export class FileData {
-  constructor(
-    public originalFileName: string,
-    public fileName: string,
-    public fileNameFull: string,
-    public encoding: string,
-    public mimetype: MimeType,
-    public fileExtension: string,
-    public fileSize: number,
-    public buffer: Buffer
-  ) {}
-
-  /**
-   * Saves the file data to the specified file path.
-   */
-  save(): string | Promise<string> {
-    return "";
-  }
-}
-
 export interface IFileSaver {
+  /**
+   * Saves the provided file data to the specified file path.
+   * @param fileData - The file data to save.
+   * @param context - The execution context, typically provided by NestJS.
+   * @returns The file path where the file was saved.
+   */
   save(fileData: FileData, context: ExecutionContext): string | Promise<string>;
 }
 
@@ -197,15 +186,36 @@ export interface IFileSaver {
  * Options for customizing file upload behavior.
  */
 export interface IFileOptions {
+  /**
+   * Function to customize the file name.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param originalFileName - The original file name.
+   * @returns The customized file name.
+   */
   customFileName?: (
     context: ExecutionContext,
     originalFileName: string
   ) => Promise<string> | string;
+  /**
+   * Custom file saver implementation.
+   */
   fileSaver?: IFileSaver;
 }
 
+/**
+ * Options for customizing behavior of the DefaultFileSaver.
+ */
 export interface DefaultFileSaverOptions {
+  /**
+   * Prefix directory where files will be saved.
+   */
   prefixDirectory?: string;
+  /**
+   * Function to customize the directory where files will be saved.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param originalDirectory - The original directory.
+   * @returns The customized directory.
+   */
   customDirectory?: (
     context: ExecutionContext,
     originalDirectory: string

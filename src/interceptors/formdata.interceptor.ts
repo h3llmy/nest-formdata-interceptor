@@ -6,14 +6,13 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import Busboy from "busboy";
-import { Request } from "express";
 import { DefaultFileSaver } from "../fileSaver/default.file-saver";
 import {
-  FileData,
   IFileOptions,
   IFileSaver,
   MimeType,
 } from "../interfaces/file.interface";
+import { FileData } from "../classes/FileData";
 
 /**
  * Interceptor to handle file uploads using Busboy.
@@ -22,7 +21,12 @@ import {
 export class FormdataInterceptor implements NestInterceptor {
   private readonly arrayRegexPattern: RegExp = /\[\]$/;
   private readonly nestedRegexPattern: RegExp = /[\[\]]/;
+  private httpRequest: any;
 
+  /**
+   * Constructs a new instance of the FormdataInterceptor class.
+   * @param fileOptions - Optional configuration options for file handling.
+   */
   constructor(private readonly fileOptions?: IFileOptions) {}
 
   /**
@@ -38,7 +42,11 @@ export class FormdataInterceptor implements NestInterceptor {
     const { customFileName, fileSaver = new DefaultFileSaver() } =
       this.fileOptions || {};
     const ctx = context.switchToHttp();
-    const request = ctx.getRequest<Request>();
+    this.httpRequest = ctx.getRequest<Request>();
+
+    const isFastify = !!this.httpRequest.raw;
+    const request = isFastify ? this.httpRequest.raw : this.httpRequest;
+
     const contentType = request.headers["content-type"];
 
     if (contentType && contentType.includes("multipart/form-data")) {
@@ -59,15 +67,14 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param context - The execution context.
    * @param next - The next call handler.
    * @param request - The HTTP request.
-   * @param prefixDirectory - The directory to save uploaded files.
    * @param customFileName - Optional function to customize file names.
-   * @param customDirectory - Optional function to customize directories.
+   * @param fileSaver - Optional file saver implementation.
    * @returns An Observable that processes the file upload.
    */
   private async handleMultipartFormData(
     context: ExecutionContext,
     next: CallHandler,
-    request: Request,
+    request: any,
     customFileName?: (
       context: ExecutionContext,
       originalFileName: string
@@ -123,7 +130,7 @@ export class FormdataInterceptor implements NestInterceptor {
       });
 
       busboy.on("finish", () => {
-        request["body"] = { ...fields, ...files };
+        this.httpRequest["body"] = { ...fields, ...files };
         next.handle().subscribe({
           next: (val) => observer.next(val),
           error: (error) => observer.error(error),

@@ -1,6 +1,7 @@
 import { validate, IsDefined } from "class-validator";
-import { FileData, MimeType } from "../../interfaces/file.interface";
+import { MimeType } from "../../interfaces/file.interface";
 import { MinFileSize } from "../../validators/minFileSize.decorator";
+import { FileData } from "../../classes/FileData";
 
 // Test class for a single file
 class TestSingleFileClass {

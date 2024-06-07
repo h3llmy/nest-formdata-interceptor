@@ -1,6 +1,7 @@
 import { validate, IsDefined } from "class-validator";
-import { FileData, MimeType } from "../../interfaces/file.interface";
+import { MimeType } from "../../interfaces/file.interface";
 import { IsFileData } from "../../validators/isFileData.decorator";
+import { FileData } from "../../classes/FileData";
 
 class TestSingleFileClass {
   @IsDefined()
