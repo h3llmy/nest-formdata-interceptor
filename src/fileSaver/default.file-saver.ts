@@ -29,7 +29,7 @@ export class DefaultFileSaver implements IFileSaver {
    * @param context - The execution context, typically provided by NestJS.
    * @returns The file path where the file was saved.
    */
-  public save(fileData: FileData, context: ExecutionContext): string {
+  public save<T = string>(fileData: FileData, context: ExecutionContext): T {
     // Determine the directory where the file will be saved.
     const directory = this.options.customDirectory
       ? this.options.customDirectory(context, this.options.prefixDirectory)
@@ -49,6 +49,6 @@ export class DefaultFileSaver implements IFileSaver {
     fs.writeFileSync(filePath, fileData.buffer);
 
     // Return the file path where the file was saved.
-    return filePath;
+    return filePath as T;
   }
 }

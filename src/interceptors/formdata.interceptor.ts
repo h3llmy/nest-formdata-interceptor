@@ -86,7 +86,7 @@ export class FormdataInterceptor implements NestInterceptor {
       const files = {};
       const fields = {};
 
-      busboy.on("file", async (fieldname, file, filename) => {
+      busboy.on("file", async (fieldname, file, fileInfo) => {
         const fileBuffer = [];
         let fileSize = 0;
 
@@ -96,8 +96,8 @@ export class FormdataInterceptor implements NestInterceptor {
         });
 
         file.on("end", async () => {
-          const fileExtension = filename.filename.split(".").pop();
-          const fileNameOnly = filename.filename
+          const fileExtension = fileInfo.filename.split(".").pop();
+          const fileNameOnly = fileInfo.filename
             .split(".")
             .slice(0, -1)
             .join(".");
@@ -111,11 +111,11 @@ export class FormdataInterceptor implements NestInterceptor {
           };
 
           const fileData = new FileData(
-            filename.filename,
+            fileInfo.filename,
             finalFileName,
             fullFileName,
-            filename.encoding,
-            filename.mimeType as MimeType,
+            fileInfo.encoding,
+            fileInfo.mimeType as MimeType,
             fileExtension,
             fileSize,
             Buffer.concat(fileBuffer)
