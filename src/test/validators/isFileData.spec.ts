@@ -29,7 +29,7 @@ describe("IsFileData", () => {
     );
   };
 
-  const createFileData = (mimetype: MimeType | string): FileData => ({
+  const createFileData = (mimetype: MimeType | string): any => ({
     originalFileName: "testfile.jpg",
     fileName: "testfile",
     fileNameFull: `testfile.${mimetype?.split("/")[1] || "file"}`,

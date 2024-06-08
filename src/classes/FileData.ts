@@ -1,7 +1,7 @@
 import { MimeType } from "../interfaces/file.interface";
 
 /**
- * Represents the data for a file.
+ * Represents the data for a fileupload.
  */
 export class FileData {
   constructor(
@@ -18,7 +18,7 @@ export class FileData {
   /**
    * Saves the file data to the data storage.
    */
-  save(): string | Promise<string> {
-    return "";
+  save<T = string>(): T {
+    return "" as T;
   }
 }
