@@ -224,10 +224,10 @@ export class AppController {
   @Post()
   getHello(@Body() createDto: CreateDto) {
     // save single file
-    createDto.file.save();
+    createDto.file.save(); // by default the file save data type is string
 
     // save multiple file
-    createDto.files.map((file) => file.save<string>());
+    createDto.files.map((file) => file.save<string>()); // by default the file save data type is string
   }
 }
 ```
