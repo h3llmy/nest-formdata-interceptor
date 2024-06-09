@@ -140,12 +140,9 @@ import { FileData, IFileSaver } from "nestjs-formdata-interceptor";
 import { ExecutionContext } from "@nestjs/common";
 
 export class CustomFileSaver implements IFileSaver {
-  public save(
-    fileData: FileData,
-    context: ExecutionContext
-  ): string | Promise<string> {
+  public save(fileData: FileData, context: ExecutionContext): any {
     // do your file save logic
-    // and return the string value of your file url
+    // and return the file save data
   }
 }
 ```
