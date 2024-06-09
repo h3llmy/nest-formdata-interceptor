@@ -227,7 +227,7 @@ export class AppController {
     createDto.file.save();
 
     // save multiple file
-    createDto.files.map((file) => file.save());
+    createDto.files.map((file) => file.save<string>());
   }
 }
 ```
