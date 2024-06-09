@@ -12,6 +12,12 @@ To install `nestjs-formdata-interceptor` using npm:
 npm install nestjs-formdata-interceptor
 ```
 
+### OR using yarn
+
+```sh
+yarn add nestjs-formdata-interceptor
+```
+
 ### Usage
 
 To use `nestjs-formdata-interceptor`, import it into the main directory of your NestJS application and configure it as shown below:
@@ -88,6 +94,28 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
+```
+
+### OR
+
+you can use route spesific interceptor
+
+```ts
+import { Body, Controller, Post, UseInterceptors } from "@nestjs/common";
+import { AppService } from "./app.service";
+import { CreateDto } from "./dto/create.dto";
+import { FormdataInterceptor } from "nestjs-formdata-interceptor";
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Post()
+  @UseInterceptors(new FormdataInterceptor())
+  getHello(@Body() createDto: CreateDto) {
+    // your controller logic
+  }
+}
 ```
 
 ### Explanation

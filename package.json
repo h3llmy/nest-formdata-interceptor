@@ -18,6 +18,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "prepublish": "npm test && npm run build",
     "test:watch": "jest --watchAll"
   },
   "jest": {
