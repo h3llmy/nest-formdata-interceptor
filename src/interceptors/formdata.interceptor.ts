@@ -13,6 +13,7 @@ import {
   MimeType,
 } from "../interfaces/file.interface";
 import { FileData } from "../classes/FileData";
+import { DEFAULT_INTERCEPTOR_CONFIG } from "../config/defaultInterceptor.config";
 
 /**
  * Interceptor to handle file uploads using Busboy.
@@ -27,7 +28,9 @@ export class FormdataInterceptor implements NestInterceptor {
    * Constructs a new instance of the FormdataInterceptor class.
    * @param fileOptions - Optional configuration options for file handling.
    */
-  constructor(private readonly fileOptions?: IFileOptions) {}
+  constructor(private readonly fileOptions?: IFileOptions) {
+    this.fileOptions = { ...fileOptions, ...DEFAULT_INTERCEPTOR_CONFIG };
+  }
 
   /**
    * Intercepts the request to handle file uploads if the content type is multipart/form-data.
@@ -39,17 +42,15 @@ export class FormdataInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler
   ): Promise<Observable<any>> {
-    const { customFileName, fileSaver = new DefaultFileSaver() } =
-      this.fileOptions || {};
+    const { customFileName, fileSaver } = this.fileOptions;
     const ctx = context.switchToHttp();
     this.httpRequest = ctx.getRequest<Request>();
 
-    const isFastify = !!this.httpRequest.raw;
-    const request = isFastify ? this.httpRequest.raw : this.httpRequest;
+    const request = this.httpRequest.raw ?? this.httpRequest;
 
     const contentType = request.headers["content-type"];
 
-    if (contentType && contentType.includes("multipart/form-data")) {
+    if (contentType?.includes("multipart/form-data")) {
       return this.handleMultipartFormData(
         context,
         next,

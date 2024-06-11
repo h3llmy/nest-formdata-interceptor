@@ -6,6 +6,7 @@ import {
   IFileSaver,
 } from "../interfaces/file.interface";
 import { FileData } from "../classes/FileData";
+import { DEFAULT_FILE_SAVER_OPTION } from "../config/defaultFileSaver.config";
 
 /**
  * Default implementation of the IFileSaver interface.
@@ -17,9 +18,7 @@ export class DefaultFileSaver implements IFileSaver {
    * @param options - Optional configuration options for the file saver.
    */
   constructor(private readonly options?: DefaultFileSaverOptions) {
-    // If options are provided, ensure prefixDirectory is set to "./public" if not specified.
-    this.options = this.options ?? {};
-    this.options.prefixDirectory = this.options.prefixDirectory ?? "./public";
+    this.options = { ...options, ...DEFAULT_FILE_SAVER_OPTION };
   }
 
   /**
