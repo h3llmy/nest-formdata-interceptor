@@ -46,7 +46,7 @@ describe("HasMimeType", () => {
     expect(errors[0].constraints).toHaveProperty("HasMimeTypeConstraint");
   });
 
-  it("should validate array of files with allowed mimetypes", async () => {
+  it("should validate array of files with allowed mime types", async () => {
     const instance = new TestMultipleFilesClass();
     instance.files = [
       createFileData("image/jpeg"),

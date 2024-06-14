@@ -30,9 +30,9 @@ describe("IsFileData", () => {
   };
 
   const createFileData = (mimetype: MimeType | string): any => ({
-    originalFileName: "testfile.jpg",
-    fileName: "testfile",
-    fileNameFull: `testfile.${mimetype?.split("/")[1] || "file"}`,
+    originalFileName: "testFile.jpg",
+    fileName: "testFile",
+    fileNameFull: `testFile.${mimetype?.split("/")[1] || "file"}`,
     encoding: "7bit",
     mimetype: mimetype as MimeType,
     fileExtension: mimetype?.split("/")[1] || "",
@@ -60,7 +60,7 @@ describe("IsFileData", () => {
     expect(errors[0].constraints).toHaveProperty("IsFileDataConstraint");
   });
 
-  it("should validate array of files with allowed mimetypes", async () => {
+  it("should validate array of files with allowed mime types", async () => {
     const instance = new TestMultipleFilesClass();
     instance.files = [createFileDataConstant(), createFileDataConstant()];
 

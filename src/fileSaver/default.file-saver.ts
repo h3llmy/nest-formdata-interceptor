@@ -18,7 +18,7 @@ export class DefaultFileSaver implements IFileSaver {
    * @param options - Optional configuration options for the file saver.
    */
   constructor(private readonly options?: DefaultFileSaverOptions) {
-    this.options = { ...options, ...DEFAULT_FILE_SAVER_OPTION };
+    this.options = { ...DEFAULT_FILE_SAVER_OPTION, ...options };
   }
 
   /**
@@ -33,6 +33,8 @@ export class DefaultFileSaver implements IFileSaver {
     const directory = this.options.customDirectory
       ? this.options.customDirectory(context, this.options.prefixDirectory)
       : this.options.prefixDirectory;
+
+    console.log(directory);
 
     // Construct the full file path, ensuring platform-independent path separators.
     const filePath = path

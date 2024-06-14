@@ -6,7 +6,6 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import Busboy from "busboy";
-import { DefaultFileSaver } from "../fileSaver/default.file-saver";
 import {
   IFileOptions,
   IFileSaver,
@@ -21,7 +20,7 @@ import { DEFAULT_INTERCEPTOR_CONFIG } from "../config/defaultInterceptor.config"
 @Injectable()
 export class FormdataInterceptor implements NestInterceptor {
   private readonly arrayRegexPattern: RegExp = /\[\]$/;
-  private readonly nestedRegexPattern: RegExp = /[\[\]]/;
+  private readonly nestedRegexPattern: RegExp = /[[\]]/;
   private httpRequest: any;
 
   /**
@@ -29,7 +28,7 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param fileOptions - Optional configuration options for file handling.
    */
   constructor(private readonly fileOptions?: IFileOptions) {
-    this.fileOptions = { ...fileOptions, ...DEFAULT_INTERCEPTOR_CONFIG };
+    this.fileOptions = { ...DEFAULT_INTERCEPTOR_CONFIG, ...fileOptions };
   }
 
   /**
@@ -87,16 +86,17 @@ export class FormdataInterceptor implements NestInterceptor {
       const files = {};
       const fields = {};
 
-      busboy.on("file", async (fieldname, file, fileInfo) => {
+      busboy.on("file", async (fieldName, fileStream, fileInfo) => {
         const fileBuffer = [];
         let fileSize = 0;
 
-        file.on("data", (data) => {
+        fileStream.on("data", (data) => {
           fileBuffer.push(data);
           fileSize += data.length;
+          // console.log(process.memoryUsage());
         });
 
-        file.on("end", async () => {
+        fileStream.on("end", async () => {
           const fileExtension = fileInfo.filename.split(".").pop();
           const fileNameOnly = fileInfo.filename
             .split(".")
@@ -107,9 +107,7 @@ export class FormdataInterceptor implements NestInterceptor {
             : fileNameOnly;
           const fullFileName = `${finalFileName}.${fileExtension}`;
 
-          FileData.prototype.save = function (this: FileData) {
-            return fileSaver.save(this, context);
-          };
+          this.assignFile(fileSaver, context);
 
           const fileData = new FileData(
             fileInfo.filename,
@@ -122,12 +120,12 @@ export class FormdataInterceptor implements NestInterceptor {
             Buffer.concat(fileBuffer)
           );
 
-          this.handleField(files, fieldname, fileData);
+          this.handleField(files, fieldName, fileData);
         });
       });
 
-      busboy.on("field", (fieldname, val) => {
-        this.handleField(fields, fieldname, val);
+      busboy.on("field", (fieldName, val) => {
+        this.handleField(fields, fieldName, val);
       });
 
       busboy.on("finish", () => {
@@ -144,14 +142,26 @@ export class FormdataInterceptor implements NestInterceptor {
   }
 
   /**
+   * assign save file strategy
+   *
+   * @param fileSaver  - file saver  strategy
+   * @param context - The execution context.
+   */
+  assignFile(fileSaver: IFileSaver, context: ExecutionContext): void {
+    FileData.prototype.save = function (this: FileData) {
+      return fileSaver.save(this, context);
+    };
+  }
+
+  /**
    * Handles a field by setting its value in the target object, supporting nested fields and arrays.
    * @param target - The target object to set the field value.
-   * @param fieldname - The name of the field.
+   * @param fieldName - The name of the field.
    * @param value - The value to set.
    */
-  private handleField(target: any, fieldname: string, value: any) {
-    const keys = fieldname.split(this.nestedRegexPattern).filter(Boolean);
-    const isArrayField = this.arrayRegexPattern.test(fieldname);
+  private handleField(target: any, fieldName: string, value: any) {
+    const keys = fieldName.split(this.nestedRegexPattern).filter(Boolean);
+    const isArrayField = this.arrayRegexPattern.test(fieldName);
     this.setNestedValue(target, keys, value, isArrayField);
   }
 
@@ -169,24 +179,12 @@ export class FormdataInterceptor implements NestInterceptor {
     isArray = false
   ) {
     let current = obj;
+
     keys.forEach((key, index) => {
-      if (index === keys.length - 1) {
-        if (isArray) {
-          if (!Array.isArray(current[key])) {
-            current[key] = [];
-          }
-          current[key].push(value);
-        } else {
-          if (current[key]) {
-            if (Array.isArray(current[key])) {
-              current[key].push(value);
-            } else {
-              current[key] = [current[key], value];
-            }
-          } else {
-            current[key] = value;
-          }
-        }
+      const isLastKey = index === keys.length - 1;
+
+      if (isLastKey) {
+        this.assignValue(current, key, value, isArray);
       } else {
         if (!current[key]) {
           current[key] = {};
@@ -194,5 +192,51 @@ export class FormdataInterceptor implements NestInterceptor {
         current = current[key];
       }
     });
+  }
+
+  /**
+   * Assigns a value to the specified key in an object, supporting arrays.
+   * @param obj - The object to set the value in.
+   * @param key - The key to set the value for.
+   * @param value - The value to set.
+   * @param isArray - Whether the field is an array.
+   */
+  private assignValue(obj: any, key: string, value: any, isArray: boolean) {
+    if (isArray) {
+      this.assignArrayValue(obj, key, value);
+    } else {
+      this.assignSingleValue(obj, key, value);
+    }
+  }
+
+  /**
+   * Assigns a single value or array value to the specified key in an object.
+   * @param obj - The object to set the value in.
+   * @param key - The key to set the value for.
+   * @param value - The value to set.
+   */
+  private assignSingleValue(obj: any, key: string, value: any) {
+    if (obj[key]) {
+      if (Array.isArray(obj[key])) {
+        obj[key].push(value);
+      } else {
+        obj[key] = [obj[key], value];
+      }
+    } else {
+      obj[key] = value;
+    }
+  }
+
+  /**
+   * Assigns a value to an array at the specified key in an object.
+   * @param obj - The object to set the value in.
+   * @param key - The key to set the value for.
+   * @param value - The value to set.
+   */
+  private assignArrayValue(obj: any, key: string, value: any) {
+    if (!Array.isArray(obj[key])) {
+      obj[key] = [];
+    }
+    obj[key].push(value);
   }
 }
