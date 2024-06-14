@@ -93,7 +93,6 @@ export class FormdataInterceptor implements NestInterceptor {
         fileStream.on("data", (data) => {
           fileBuffer.push(data);
           fileSize += data.length;
-          // console.log(process.memoryUsage());
         });
 
         fileStream.on("end", async () => {
