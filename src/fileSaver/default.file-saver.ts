@@ -34,8 +34,6 @@ export class DefaultFileSaver implements IFileSaver {
       ? this.options.customDirectory(context, this.options.prefixDirectory)
       : this.options.prefixDirectory;
 
-    console.log(directory);
-
     // Construct the full file path, ensuring platform-independent path separators.
     const filePath = path
       .join(directory, fileData.fileNameFull)
