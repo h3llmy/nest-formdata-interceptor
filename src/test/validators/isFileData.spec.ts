@@ -25,6 +25,7 @@ describe("IsFileData", () => {
       MimeType["image/png"],
       "png",
       10000,
+      "hash",
       Buffer.from("test")
     );
   };

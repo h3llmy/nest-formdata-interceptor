@@ -12,6 +12,7 @@ export class FileData {
     public mimetype: MimeType,
     public fileExtension: string,
     public fileSize: number,
+    public hash: string,
     public buffer: Buffer
   ) {}
 

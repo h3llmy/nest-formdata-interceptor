@@ -6,18 +6,14 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import Busboy from "busboy";
-import {
-  IFileOptions,
-  IFileSaver,
-  MimeType,
-} from "../interfaces/file.interface";
+import { IFileOptions, IFileSaver } from "../interfaces/file.interface";
 import { FileData } from "../classes/FileData";
 import { DEFAULT_INTERCEPTOR_CONFIG } from "../config/defaultInterceptor.config";
-import crypto from "crypto";
 
 /**
  * Interceptor to handle file uploads using Busboy.
  */
+
 @Injectable()
 export class FormdataInterceptor implements NestInterceptor {
   private readonly arrayRegexPattern: RegExp = /\[\]$/;
@@ -87,48 +83,41 @@ export class FormdataInterceptor implements NestInterceptor {
       const fields: Record<string, any> = {};
 
       this.busboy.on("file", async (fieldName, fileStream, fileInfo) => {
-        const bufferChunks: Uint8Array[] = [];
         let fileSize: number = 0;
-
         fileStream.on("data", (data) => {
-          bufferChunks.push(data);
           fileSize += data.length;
         });
-
-        fileStream.on("end", async () => {
-          const hash = crypto.createHash("md5");
-          const fileBuffer: Buffer = Buffer.concat(bufferChunks);
-          const fileExtension = fileInfo.filename.split(".").pop();
-          const fileNameOnly = fileInfo.filename
-            .split(".")
-            .slice(0, -1)
-            .join(".");
-          const finalFileName = customFileName
-            ? await customFileName(context, fileNameOnly)
-            : fileNameOnly;
-          const fullFileName = `${finalFileName}.${fileExtension}`;
-
-          this.assignFile(fileSaver, context);
-
-          const fileData: FileData = new FileData(
-            fileInfo.filename,
-            finalFileName,
-            fullFileName,
-            fileInfo.encoding,
-            fileInfo.mimeType as MimeType,
-            fileExtension,
-            fileSize,
-            hash.update(fileBuffer).digest("hex"),
-            fileBuffer
-          );
-
-          this.handleField(files, fieldName, fileData);
-        });
-
-        fileStream.on("error", (error) => {
-          observer.error(error);
-          this.handleDone();
-        });
+        fileStream.on("end", () => {});
+        // fileStream.on("end", async () => {
+        //   const hash = crypto.createHash("md5");
+        //   const fileBuffer: Buffer = Buffer.concat(bufferChunks);
+        //   const fileExtension = fileInfo.filename.split(".").pop();
+        //   const fileNameOnly = fileInfo.filename
+        //     .split(".")
+        //     .slice(0, -1)
+        //     .join(".");
+        //   const finalFileName = customFileName
+        //     ? await customFileName(context, fileNameOnly)
+        //     : fileNameOnly;
+        //   const fullFileName = `${finalFileName}.${fileExtension}`;
+        //   this.assignFile(fileSaver, context);
+        //   const fileData: FileData = new FileData(
+        //     fileInfo.filename,
+        //     finalFileName,
+        //     fullFileName,
+        //     fileInfo.encoding,
+        //     fileInfo.mimeType as MimeType,
+        //     fileExtension,
+        //     fileSize,
+        //     hash.update(fileBuffer).digest("hex"),
+        //     fileBuffer
+        //   );
+        this.handleField(files, fieldName, fileStream);
+        // });
+        // fileStream.on("error", (error) => {
+        //   observer.error(error);
+        //   this.handleDone();
+        // });
       });
 
       this.busboy.on("field", (fieldName, val) => {
@@ -152,9 +141,6 @@ export class FormdataInterceptor implements NestInterceptor {
     });
   }
 
-  /**
-   * Cleans up the resources used by the `busboy` instance and removes all event listeners.
-   */
   handleDone(): void {
     this.busboy.removeAllListeners();
     this.httpRequest.unpipe(this.busboy);

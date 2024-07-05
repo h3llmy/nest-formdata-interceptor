@@ -27,6 +27,7 @@ describe("MaxFileSize", () => {
       "image/jpeg" as MimeType,
       "png",
       fileSize,
+      "hash",
       Buffer.from("test")
     );
   };
