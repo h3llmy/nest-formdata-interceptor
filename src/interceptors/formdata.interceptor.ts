@@ -133,7 +133,6 @@ export class FormdataInterceptor implements NestInterceptor {
 
       this.busboy.on("field", (fieldName, val) => {
         this.handleField(fields, fieldName, val);
-        this.handleDone();
       });
 
       this.busboy.on("finish", () => {
