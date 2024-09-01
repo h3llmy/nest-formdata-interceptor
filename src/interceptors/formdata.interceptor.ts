@@ -147,7 +147,9 @@ export class FormdataInterceptor implements NestInterceptor {
         });
       });
 
-      this.httpRequest.pipe(this.busboy);
+      this.httpRequest?.raw
+        ? this.httpRequest.raw.pipe(this.busboy)
+        : this.httpRequest.pipe(this.busboy);
     });
   }
 
@@ -156,7 +158,9 @@ export class FormdataInterceptor implements NestInterceptor {
    */
   handleDone(): void {
     this.busboy.removeAllListeners();
-    this.httpRequest.unpipe(this.busboy);
+    this.httpRequest.raw
+      ? this.httpRequest.raw.unpipe(this.busboy)
+      : this.httpRequest.unpipe(this.busboy);
   }
 
   /**
