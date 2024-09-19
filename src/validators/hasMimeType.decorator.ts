@@ -20,14 +20,18 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
    * @returns A boolean indicating whether the mimetype matches the specified types.
    */
   public validate(value: FileData, args: ValidationArguments) {
-    const [mimeType] = args.constraints as [(MimeType | string)[]];
+    const [mimeType, option] = args.constraints as [
+      (MimeType | string)[],
+      ValidationOptions
+    ];
 
-    if (Array.isArray(value)) {
+    if (option?.each && Array.isArray(value)) {
       return value.every((item: FileData) =>
         this.matchesWildcard(mimeType, item.mimetype)
       );
+    } else {
+      return this.matchesWildcard(mimeType, value?.mimetype);
     }
-    return this.matchesWildcard(mimeType, value?.mimetype);
   }
 
   /**
