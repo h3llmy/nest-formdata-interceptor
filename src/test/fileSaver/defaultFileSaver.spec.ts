@@ -24,6 +24,7 @@ describe("DefaultFileSaver", () => {
     MimeType["image/png"],
     "txt",
     100,
+    "hash",
     Buffer.from("Hello, world!")
   );
 

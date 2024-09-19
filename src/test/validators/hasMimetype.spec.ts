@@ -31,6 +31,7 @@ describe("HasMimeType", () => {
       mimetype as MimeType,
       "png",
       10000,
+      "hash",
       Buffer.from("test")
     );
   };

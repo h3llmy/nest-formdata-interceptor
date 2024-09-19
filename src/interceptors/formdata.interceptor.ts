@@ -13,6 +13,7 @@ import {
 } from "../interfaces/file.interface";
 import { FileData } from "../classes/FileData";
 import { DEFAULT_INTERCEPTOR_CONFIG } from "../config/defaultInterceptor.config";
+import crypto from "crypto";
 
 /**
  * Interceptor to handle file uploads using Busboy.
@@ -22,6 +23,7 @@ export class FormdataInterceptor implements NestInterceptor {
   private readonly arrayRegexPattern: RegExp = /\[\]$/;
   private readonly nestedRegexPattern: RegExp = /[[\]]/;
   private httpRequest: any;
+  private busboy: Busboy.Busboy;
 
   /**
    * Constructs a new instance of the FormdataInterceptor class.
@@ -53,7 +55,6 @@ export class FormdataInterceptor implements NestInterceptor {
       return this.handleMultipartFormData(
         context,
         next,
-        request,
         customFileName,
         fileSaver
       );
@@ -74,7 +75,6 @@ export class FormdataInterceptor implements NestInterceptor {
   private async handleMultipartFormData(
     context: ExecutionContext,
     next: CallHandler,
-    request: any,
     customFileName?: (
       context: ExecutionContext,
       originalFileName: string
@@ -82,20 +82,22 @@ export class FormdataInterceptor implements NestInterceptor {
     fileSaver?: IFileSaver
   ): Promise<Observable<any>> {
     return new Observable((observer) => {
-      const busboy = Busboy({ headers: request.headers });
-      const files = {};
-      const fields = {};
+      this.busboy = Busboy({ headers: this.httpRequest.headers });
+      const files: Record<string, FileData> = {};
+      const fields: Record<string, any> = {};
 
-      busboy.on("file", async (fieldName, fileStream, fileInfo) => {
-        const fileBuffer = [];
-        let fileSize = 0;
+      this.busboy.on("file", async (fieldName, fileStream, fileInfo) => {
+        const bufferChunks: Uint8Array[] = [];
+        let fileSize: number = 0;
 
         fileStream.on("data", (data) => {
-          fileBuffer.push(data);
+          bufferChunks.push(data);
           fileSize += data.length;
         });
 
         fileStream.on("end", async () => {
+          const hash = crypto.createHash("md5");
+          const fileBuffer: Buffer = Buffer.concat(bufferChunks);
           const fileExtension = fileInfo.filename.split(".").pop();
           const fileNameOnly = fileInfo.filename
             .split(".")
@@ -108,7 +110,7 @@ export class FormdataInterceptor implements NestInterceptor {
 
           this.assignFile(fileSaver, context);
 
-          const fileData = new FileData(
+          const fileData: FileData = new FileData(
             fileInfo.filename,
             finalFileName,
             fullFileName,
@@ -116,28 +118,49 @@ export class FormdataInterceptor implements NestInterceptor {
             fileInfo.mimeType as MimeType,
             fileExtension,
             fileSize,
-            Buffer.concat(fileBuffer)
+            hash.update(fileBuffer).digest("hex"),
+            fileBuffer
           );
 
           this.handleField(files, fieldName, fileData);
         });
+
+        fileStream.on("error", (error) => {
+          observer.error(error);
+          this.handleDone();
+        });
       });
 
-      busboy.on("field", (fieldName, val) => {
+      this.busboy.on("field", (fieldName, val) => {
         this.handleField(fields, fieldName, val);
       });
 
-      busboy.on("finish", () => {
+      this.busboy.on("finish", () => {
         this.httpRequest["body"] = { ...fields, ...files };
         next.handle().subscribe({
           next: (val) => observer.next(val),
           error: (error) => observer.error(error),
-          complete: () => observer.complete(),
+          complete: () => {
+            observer.complete();
+            this.handleDone();
+          },
         });
       });
 
-      request.pipe(busboy);
+      this.httpRequest?.raw
+        ? this.httpRequest.raw.pipe(this.busboy)
+        : this.httpRequest.pipe(this.busboy);
     });
+  }
+
+  /**
+   * Cleans up the resources used by the `busboy` instance and removes all event listeners.
+   */
+  handleDone(): void {
+    this.busboy.removeAllListeners();
+    this.httpRequest.raw
+      ? this.httpRequest.raw.unpipe(this.busboy)
+      : this.httpRequest.unpipe(this.busboy);
   }
 
   /**
