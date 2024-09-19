@@ -9,6 +9,12 @@ class TestSingleFileClass {
   file: FileData;
 }
 
+class TestingGenericFileClass {
+  @IsDefined()
+  @HasMimeType(["image/*"])
+  file: FileData;
+}
+
 class TestMultipleFilesClass {
   @IsDefined()
   @HasMimeType(["image/jpeg", "image/png"], { each: true })
@@ -36,6 +42,23 @@ describe("HasMimeType", () => {
 
     const errors = await validate(instance);
     expect(errors.length).toBe(0);
+  });
+
+  it("should validate single file with allowed generic mimetype", async () => {
+    const instance = new TestingGenericFileClass();
+    instance.file = createFileData("image/jpeg");
+
+    const errors = await validate(instance);
+    expect(errors.length).toBe(0);
+  });
+
+  it("should fail validation single file with allowed generic mimetype", async () => {
+    const instance = new TestingGenericFileClass();
+    instance.file = createFileData("video/mp4");
+
+    const errors = await validate(instance);
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0].constraints).toHaveProperty("HasMimeTypeConstraint");
   });
 
   it("should fail validation for single file with disallowed mimetype", async () => {
