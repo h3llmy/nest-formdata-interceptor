@@ -4,6 +4,11 @@ import { FileData } from "../classes/FileData";
  * Enum for the mime types.
  */
 export enum MimeType {
+  "application/*" = "application/*",
+  "image/*" = "image/*",
+  "audio/*" = "audio/*",
+  "text/*" = "text/*",
+  "video/*" = "video/*",
   "application/andrew-inset" = "application/andrew-inset",
   "application/applixware" = "application/applixware",
   "application/atom+xml" = "application/atom+xml",
