@@ -3,7 +3,7 @@ import { MimeType } from "../interfaces/file.interface";
 /**
  * Represents the data for a file upload.
  */
-export class FileData {
+export class FileData<ReturnType = string, SavePayloadType = undefined> {
   constructor(
     public originalFileName: string,
     public fileName: string,
@@ -19,7 +19,7 @@ export class FileData {
   /**
    * Saves the file data to the data storage.
    */
-  save<T = string>(): T {
-    return "" as T;
+  save(args?: SavePayloadType): ReturnType {
+    return "" as ReturnType;
   }
 }
