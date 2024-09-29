@@ -170,8 +170,8 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param context - The execution context.
    */
   assignFile(fileSaver: IFileSaver, context: ExecutionContext): void {
-    FileData.prototype.save = function (this: FileData) {
-      return fileSaver.save(this, context);
+    FileData.prototype.save = function (this: FileData, args: unknown) {
+      return fileSaver.save(this, context, args);
     };
   }
 

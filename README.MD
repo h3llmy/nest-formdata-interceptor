@@ -1,6 +1,6 @@
 # nestjs-formdata-interceptor
 
-`nestjs-formdata-interceptor` is a powerful library for NestJS that provides seamless interception and handling of multipart/form-data requests. This functionality is particularly beneficial for efficiently managing file uploads in your application.
+`nestjs-formdata-interceptor` is a powerful library for [NestJS](https://docs.nestjs.com/) that provides seamless interception and handling of multipart/form-data requests. This functionality is particularly beneficial for efficiently managing file uploads in your application.
 
 ## Getting Started
 
@@ -55,7 +55,7 @@ bootstrap();
 
 ### Fastify
 
-need to install [@fastify/multipart](https://www.npmjs.com/package/@fastify/multipart) package.
+need to install [`@fastify/multipart`](https://www.npmjs.com/package/@fastify/multipart) package.
 
 ```ts
 import { NestFactory } from "@nestjs/core";
@@ -140,7 +140,11 @@ import { FileData, IFileSaver } from "nestjs-formdata-interceptor";
 import { ExecutionContext } from "@nestjs/common";
 
 export class CustomFileSaver implements IFileSaver {
-  public save(fileData: FileData, context: ExecutionContext): any {
+  public save(
+    fileData: FileData,
+    context: ExecutionContext,
+    args: unknown // this will be get from save method payload
+  ): any {
     // do your file save logic
     // and return the file save data
   }
@@ -175,7 +179,7 @@ bootstrap();
 
 ### File Validation
 
-If you are using `class-validator` describe dto and specify validation rules
+If you are using [`class-validator`](https://www.npmjs.com/package/class-validator) describe dto and specify validation rules
 
 ```ts
 import { IsArray, IsNotEmpty } from "class-validator";
@@ -205,6 +209,18 @@ export class CreateDto {
   @MaxFileSize(4000000)
   // single file
   file: FileData;
+
+  @IsFileData()
+  @IsNotEmpty()
+  @HasMimeType([MimeType["video/mp4"], "image/png"])
+  @MinFileSize(2000000)
+  @MaxFileSize(4000000)
+  /**
+   * customize file data save method
+   * @param args [string] the payload sent to the custom file saver
+   * @returns [Promise<string>] the file path where the file was saved
+   * */
+  customizeFileData: FileData<Promise<string>, string>;
 }
 ```
 
@@ -222,12 +238,15 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post()
-  getHello(@Body() createDto: CreateDto) {
+  async getHello(@Body() createDto: CreateDto) {
     // save single file
     createDto.file.save(); // by default the file save data type is string
 
     // save multiple file
-    createDto.files.map((file) => file.save<string>()); // by default the file save data type is string
+    createDto.files.map((file) => file.save()); // by default the file save data type is string
+
+    // customize file data example
+    await createDto.customizeFileData.save("bucket_name"); // it will be returning Promise<string>
   }
 }
 ```
