@@ -182,6 +182,7 @@ export interface IFileSaver {
    * Saves the provided file data to the specified file path.
    * @param fileData - The file data to save.
    * @param context - The execution context, typically provided by NestJS.
+   * @param args - Optional payload sent to save method.
    * @returns The file path where the file was saved.
    */
   save(fileData: FileData, context: ExecutionContext, args?: unknown): any;
