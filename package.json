@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build --clean",
     "test": "jest",
     "prepublish": "npm test && npm run build",
     "test:watch": "jest --watchAll"
