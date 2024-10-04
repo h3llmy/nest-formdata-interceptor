@@ -206,6 +206,11 @@ export interface IFileOptions {
    * Custom file saver implementation.
    */
   fileSaver?: IFileSaver;
+
+  /**
+   * Location of the file in the request context.
+   */
+  requestLocation?: string;
 }
 
 /**

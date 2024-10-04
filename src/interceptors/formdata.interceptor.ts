@@ -136,7 +136,10 @@ export class FormdataInterceptor implements NestInterceptor {
       });
 
       this.busboy.on("finish", () => {
-        this.httpRequest["body"] = { ...fields, ...files };
+        this.httpRequest[this.fileOptions.requestLocation] = {
+          ...fields,
+          ...files,
+        };
         next.handle().subscribe({
           next: (val) => observer.next(val),
           error: (error) => observer.error(error),
