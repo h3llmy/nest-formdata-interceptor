@@ -136,7 +136,10 @@ export class FormdataInterceptor implements NestInterceptor {
       });
 
       this.busboy.on("finish", () => {
-        this.httpRequest["body"] = { ...fields, ...files };
+        this.httpRequest[this.fileOptions.requestLocation] = {
+          ...fields,
+          ...files,
+        };
         next.handle().subscribe({
           next: (val) => observer.next(val),
           error: (error) => observer.error(error),
@@ -224,11 +227,9 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param isArray - Whether the field is an array.
    */
   private assignValue(obj: any, key: string, value: any, isArray: boolean) {
-    if (isArray) {
-      this.assignArrayValue(obj, key, value);
-    } else {
-      this.assignSingleValue(obj, key, value);
-    }
+    isArray
+      ? this.assignArrayValue(obj, key, value)
+      : this.assignSingleValue(obj, key, value);
   }
 
   /**
