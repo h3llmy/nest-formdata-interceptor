@@ -1,6 +1,6 @@
 {
   "name": "nestjs-formdata-interceptor",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "nest js formdata interceptor",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,9 +14,12 @@
     "type": "git",
     "url": "git+https://github.com/h3llmy/nest-formdata-interceptor.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build --clean",
     "test": "jest",
     "prepublish": "npm test && npm run build",
     "test:watch": "jest --watchAll"
@@ -38,6 +41,7 @@
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.4",
     "jest": "^29.7.0",
+    "semantic-release": "^24.1.2",
     "ts-jest": "^29.2.5",
     "typescript": "^5.6.2"
   },
