@@ -136,8 +136,9 @@ export class FormdataInterceptor implements NestInterceptor {
       });
 
       this.busboy.on("finish", () => {
-        this.httpRequest[this.fileOptions.requestLocation] = {
-          ...fields,
+        this.httpRequest["body"] = { ...fields };
+        this.httpRequest[this.fileOptions.requestFileLocation] = {
+          ...this.httpRequest[this.fileOptions.requestFileLocation],
           ...files,
         };
         next.handle().subscribe({
@@ -159,7 +160,7 @@ export class FormdataInterceptor implements NestInterceptor {
   /**
    * Cleans up the resources used by the `busboy` instance and removes all event listeners.
    */
-  handleDone(): void {
+  private handleDone(): void {
     this.busboy.removeAllListeners();
     this.httpRequest.raw
       ? this.httpRequest.raw.unpipe(this.busboy)
@@ -172,7 +173,7 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param fileSaver  - file saver  strategy
    * @param context - The execution context.
    */
-  assignFile(fileSaver: IFileSaver, context: ExecutionContext): void {
+  private assignFile(fileSaver: IFileSaver, context: ExecutionContext): void {
     FileData.prototype.save = function (this: FileData, args: unknown) {
       return fileSaver.save(this, context, args);
     };

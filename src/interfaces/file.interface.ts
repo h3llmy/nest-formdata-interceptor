@@ -204,13 +204,15 @@ export interface IFileOptions {
   ) => Promise<string> | string;
   /**
    * Custom file saver implementation.
+   * @default DefaultFileSaver
    */
   fileSaver?: IFileSaver;
 
   /**
    * Location of the file in the request context.
+   * @default 'body'
    */
-  requestLocation?: string;
+  requestFileLocation?: string;
 }
 
 /**
