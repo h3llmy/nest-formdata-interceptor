@@ -46,10 +46,12 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@nestjs/common": "^10.4.4",
-    "busboy": "^1.6.0",
-    "class-validator": "^0.14.1",
-    "rxjs": "^7.8.1"
+    "busboy": "^1.6.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10.x",
+    "class-validator": "^0.x",
+    "rxjs": "^7.x"
   },
   "keywords": [
     "nestjs",
