@@ -14,10 +14,24 @@ import {
 export class S3FileSaver implements IFileSaver {
   private readonly s3Client: S3Client;
 
+  /**
+   * Initializes a new instance of the S3FileSaver class.
+   * Sets up the S3 client using the provided configuration options.
+   * @param fileUploadOptions - Optional configuration options for S3 file uploads.
+   */
   constructor(private readonly fileUploadOptions?: IS3FileSaverOptions) {
     this.s3Client = new S3Client(fileUploadOptions);
   }
 
+  /**
+   * Saves the provided file data to an S3 bucket.
+   * Constructs the S3 object parameters and sends a PutObjectCommand to S3.
+   * @param fileData - The file data to be saved, including the buffer and metadata.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param options - Optional S3-specific file data options, such as bucket and additional parameters.
+   * @returns A promise that resolves to the URL of the saved file in S3.
+   * @throws InternalServerErrorException if the S3 bucket is not specified.
+   */
   async save(
     fileData: FileData,
     context: ExecutionContext,
