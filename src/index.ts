@@ -7,5 +7,6 @@ export * from "./validators/maxFileSize.decorator";
 export * from "./validators/hasMimeType.decorator";
 
 export * from "./fileSaver/default.file-saver";
+export * from "./fileSaver/s3.file-saver";
 
 export * from "./classes/FileData";
