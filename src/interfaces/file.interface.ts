@@ -1,5 +1,6 @@
 import { ExecutionContext } from "@nestjs/common";
 import { FileData } from "../classes/FileData";
+import { PutObjectCommandInput, S3ClientConfig } from "@aws-sdk/client-s3";
 /**
  * Enum for the mime types.
  */
@@ -200,7 +201,7 @@ export interface IFileOptions {
    */
   customFileName?: (
     context: ExecutionContext,
-    originalFileName: string
+    originalFileName: string,
   ) => Promise<string> | string;
   /**
    * Custom file saver implementation.
@@ -231,6 +232,17 @@ export interface DefaultFileSaverOptions {
    */
   customDirectory?: (
     context: ExecutionContext,
-    originalDirectory: string
+    originalDirectory: string,
   ) => string;
 }
+
+export interface IS3FileSaverOptions extends S3ClientConfig {
+  bucket: string;
+}
+
+export type S3FileDataOptions = Omit<
+  PutObjectCommandInput,
+  "Key" | "Body" | "ContentType"
+>;
+
+export type S3FileData = FileData<Promise<string>, S3FileDataOptions | void>;
