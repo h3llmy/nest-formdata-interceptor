@@ -237,7 +237,7 @@ export interface DefaultFileSaverOptions {
 }
 
 export interface IS3FileSaverOptions extends S3ClientConfig {
-  bucket: string;
+  bucket?: string;
 }
 
 export type S3FileDataOptions = Omit<

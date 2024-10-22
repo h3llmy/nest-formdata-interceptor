@@ -1,10 +1,10 @@
 import { ExecutionContext, InternalServerErrorException } from "@nestjs/common";
-import { FileData } from "src/classes/FileData";
+import { FileData } from "../classes/FileData";
 import {
   IFileSaver,
   IS3FileSaverOptions,
   S3FileDataOptions,
-} from "src/interfaces/file.interface";
+} from "../interfaces/file.interface";
 import {
   PutObjectCommand,
   PutObjectCommandInput,
