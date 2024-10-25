@@ -17,7 +17,7 @@ export class S3FileSaver implements IFileSaver {
   /**
    * Initializes a new instance of the S3FileSaver class.
    * Sets up the S3 client using the provided configuration options.
-   * @param fileUploadOptions - Optional configuration options for S3 file uploads.
+   * @param fileUploadOptions - configuration options for S3 file uploads.
    */
   constructor(private readonly fileUploadOptions: IS3FileSaverOptions) {
     this.s3Client = new S3Client(fileUploadOptions);
