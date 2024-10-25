@@ -19,7 +19,7 @@ export class S3FileSaver implements IFileSaver {
    * Sets up the S3 client using the provided configuration options.
    * @param fileUploadOptions - Optional configuration options for S3 file uploads.
    */
-  constructor(private readonly fileUploadOptions?: IS3FileSaverOptions) {
+  constructor(private readonly fileUploadOptions: IS3FileSaverOptions) {
     this.s3Client = new S3Client(fileUploadOptions);
   }
 
@@ -38,7 +38,7 @@ export class S3FileSaver implements IFileSaver {
     options?: S3FileDataOptions,
   ): Promise<string> {
     const params: PutObjectCommandInput = {
-      Bucket: options.Bucket ?? this.fileUploadOptions.bucket,
+      Bucket: options?.Bucket ?? this.fileUploadOptions?.bucket,
       Key: fileData.fileNameFull,
       Body: fileData.buffer,
       ContentType: fileData.mimetype,
@@ -55,7 +55,7 @@ export class S3FileSaver implements IFileSaver {
     const s3Endpoint = await this.s3Client.config.endpoint();
 
     const fileUrl = this.fileUploadOptions.endpoint
-      ? `${process.env.S3_ENDPOINT}${s3Endpoint.path}${params.Bucket}/${params.Key}`
+      ? `${this.fileUploadOptions.endpoint}${s3Endpoint.path}${params.Bucket}/${params.Key}`
       : `https://${params.Bucket}.s3${this.fileUploadOptions.region}.amazonaws.com/${params.Key}`;
 
     return fileUrl;
