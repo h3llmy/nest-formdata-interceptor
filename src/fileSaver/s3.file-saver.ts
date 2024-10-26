@@ -9,7 +9,7 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { IFileSaver } from "src/interfaces/file.interface";
+import { IFileSaver } from "../interfaces/file.interface";
 
 export class S3FileSaver implements IFileSaver {
   private readonly s3Client: S3Client;
@@ -55,7 +55,9 @@ export class S3FileSaver implements IFileSaver {
     const s3Endpoint = await this.s3Client.config.endpoint();
 
     const fileUrl = this.fileUploadOptions.endpoint
-      ? `${this.fileUploadOptions.endpoint}${s3Endpoint.path}${params.Bucket}/${params.Key}`
+      ? `${this.fileUploadOptions.endpoint.toString()}${s3Endpoint.path}${
+          params.Bucket
+        }/${params.Key}`
       : `https://${params.Bucket}.s3${this.fileUploadOptions.region}.amazonaws.com/${params.Key}`;
 
     return fileUrl;
