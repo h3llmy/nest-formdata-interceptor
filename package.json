@@ -23,7 +23,10 @@
       "master",
       "next",
       "next-major",
-      "development",
+      {
+        "name": "development",
+        "prerelease": true
+      },
       {
         "name": "beta",
         "prerelease": true
