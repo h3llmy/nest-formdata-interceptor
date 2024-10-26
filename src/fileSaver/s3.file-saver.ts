@@ -1,15 +1,15 @@
 import { ExecutionContext, InternalServerErrorException } from "@nestjs/common";
 import { FileData } from "../classes/FileData";
 import {
-  IFileSaver,
   IS3FileSaverOptions,
   S3FileDataOptions,
-} from "../interfaces/file.interface";
+} from "../interfaces/s3-file.interface";
 import {
   PutObjectCommand,
   PutObjectCommandInput,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { IFileSaver } from "src/interfaces/file.interface";
 
 export class S3FileSaver implements IFileSaver {
   private readonly s3Client: S3Client;
