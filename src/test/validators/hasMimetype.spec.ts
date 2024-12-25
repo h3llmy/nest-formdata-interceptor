@@ -1,5 +1,5 @@
 import { validate, IsDefined } from "class-validator";
-import { MimeType } from "../../interfaces/file.interface";
+import type { MimeType } from "../../interfaces/file.interface";
 import { HasMimeType } from "../../validators/hasMimeType.decorator";
 import { FileData } from "../../classes/FileData";
 
@@ -32,7 +32,7 @@ describe("HasMimeType", () => {
       "png",
       10000,
       "hash",
-      Buffer.from("test")
+      Buffer.from("test"),
     );
   };
 

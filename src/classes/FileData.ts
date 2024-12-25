@@ -1,4 +1,4 @@
-import { MimeType } from "../interfaces/file.interface";
+import type { MimeType } from "../interfaces/file.interface";
 
 /**
  * Represents the data for a file upload.
@@ -13,7 +13,7 @@ export class FileData<ReturnType = string, SavePayloadType = void> {
     public fileExtension: string,
     public fileSize: number,
     public hash: string,
-    public buffer: Buffer
+    public buffer: Buffer,
   ) {}
 
   /**

@@ -1,16 +1,36 @@
 import { FileData } from "../classes/FileData";
-import {
-  registerDecorator,
+import type {
   ValidationArguments,
   ValidationOptions,
-  ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
 
+let registerDecorator: typeof import("class-validator").registerDecorator;
+let ValidatorConstraint: typeof import("class-validator").ValidatorConstraint;
+let ValidatorConstraintInterface: import("class-validator").ValidatorConstraintInterface;
+let ValidationArguments: import("class-validator").ValidationArguments;
+let ValidationOptions: import("class-validator").ValidationOptions;
+
+try {
+  // Dynamically import class-validator
+  const classValidator = require("class-validator");
+  registerDecorator = classValidator.registerDecorator;
+  ValidatorConstraint = classValidator.ValidatorConstraint;
+  ValidatorConstraintInterface = classValidator.ValidatorConstraintInterface;
+  ValidationArguments = classValidator.ValidationArguments;
+  ValidationOptions = classValidator.ValidationOptions;
+} catch (error) {
+  // Graceful fallback if class-validator is not installed
+  registerDecorator = null;
+  ValidatorConstraint = null;
+  ValidatorConstraintInterface = null;
+  ValidationArguments = null;
+  ValidationOptions = null;
+}
 /**
  * Validator constraint to check if the file size is within the maximum limit.
  */
-@ValidatorConstraint({ async: false })
+@(ValidatorConstraint?.({ async: false }))
 class MaxFileSizeConstraint implements ValidatorConstraintInterface {
   /**
    * Validates if the file size is within the maximum limit.
@@ -48,8 +68,13 @@ class MaxFileSizeConstraint implements ValidatorConstraintInterface {
  */
 export function MaxFileSize(
   maxSize: number,
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
+  if (!registerDecorator || !ValidatorConstraint) {
+    throw new Error(
+      "class-validator is not installed. Please install class-validator to use this functionality.",
+    );
+  }
   return (object: object, propertyName: string) => {
     registerDecorator({
       target: object.constructor,

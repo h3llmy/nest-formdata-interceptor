@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
-import { ExecutionContext } from "@nestjs/common";
-import {
+import type { ExecutionContext } from "@nestjs/common";
+import type {
   DefaultFileSaverOptions,
   IFileSaver,
 } from "../interfaces/file.interface";

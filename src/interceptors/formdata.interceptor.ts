@@ -1,12 +1,12 @@
-import {
-  Injectable,
+import { Injectable } from "@nestjs/common";
+import type {
+  CallHandler,
   NestInterceptor,
   ExecutionContext,
-  CallHandler,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import Busboy from "busboy";
-import {
+import type {
   IFileOptions,
   IFileSaver,
   MimeType,
@@ -41,7 +41,7 @@ export class FormdataInterceptor implements NestInterceptor {
    */
   public async intercept(
     context: ExecutionContext,
-    next: CallHandler
+    next: CallHandler,
   ): Promise<Observable<any>> {
     const { customFileName, fileSaver } = this.fileOptions;
     const ctx = context.switchToHttp();
@@ -56,7 +56,7 @@ export class FormdataInterceptor implements NestInterceptor {
         context,
         next,
         customFileName,
-        fileSaver
+        fileSaver,
       );
     }
 
@@ -77,9 +77,9 @@ export class FormdataInterceptor implements NestInterceptor {
     next: CallHandler,
     customFileName?: (
       context: ExecutionContext,
-      originalFileName: string
+      originalFileName: string,
     ) => Promise<string> | string,
-    fileSaver?: IFileSaver
+    fileSaver?: IFileSaver,
   ): Promise<Observable<any>> {
     return new Observable((observer) => {
       this.busboy = Busboy({ headers: this.httpRequest.headers });
@@ -119,7 +119,7 @@ export class FormdataInterceptor implements NestInterceptor {
             fileExtension,
             fileSize,
             hash.update(fileBuffer).digest("hex"),
-            fileBuffer
+            fileBuffer,
           );
 
           this.handleField(files, fieldName, fileData);
@@ -202,7 +202,7 @@ export class FormdataInterceptor implements NestInterceptor {
     obj: any,
     keys: string[],
     value: any,
-    isArray = false
+    isArray = false,
   ) {
     let current = obj;
 

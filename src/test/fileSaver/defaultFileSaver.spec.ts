@@ -1,11 +1,11 @@
 import { DefaultFileSaver } from "../../fileSaver/default.file-saver";
 import {
-  DefaultFileSaverOptions,
   MimeType,
+  type DefaultFileSaverOptions,
 } from "../../interfaces/file.interface";
 import fs from "fs";
 import path from "path";
-import { ExecutionContext } from "@nestjs/common";
+import type { ExecutionContext } from "@nestjs/common";
 import { FileData } from "../../classes/FileData";
 
 // Mock the fs module
@@ -25,7 +25,7 @@ describe("DefaultFileSaver", () => {
     "txt",
     100,
     "hash",
-    Buffer.from("Hello, world!")
+    Buffer.from("Hello, world!"),
   );
 
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe("DefaultFileSaver", () => {
     });
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       mockFilePath,
-      mockFileData.buffer
+      mockFileData.buffer,
     );
     expect(result).toBe(mockFilePath);
   });
@@ -77,7 +77,7 @@ describe("DefaultFileSaver", () => {
     expect(fs.mkdirSync).not.toHaveBeenCalled();
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       mockFilePath,
-      mockFileData.buffer
+      mockFileData.buffer,
     );
     expect(result).toBe(mockFilePath);
   });
@@ -102,7 +102,7 @@ describe("DefaultFileSaver", () => {
 
     expect(customDirectory).toHaveBeenCalledWith(
       mockExecutionContext,
-      mockPrefixDirectory
+      mockPrefixDirectory,
     );
     expect(fs.existsSync).toHaveBeenCalledWith("custom/dir");
     expect(fs.mkdirSync).toHaveBeenCalledWith("custom/dir", {
@@ -110,7 +110,7 @@ describe("DefaultFileSaver", () => {
     });
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       mockFilePath,
-      mockFileData.buffer
+      mockFileData.buffer,
     );
     expect(result).toBe(mockFilePath);
   });
