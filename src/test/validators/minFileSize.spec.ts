@@ -1,5 +1,5 @@
 import { validate, IsDefined } from "class-validator";
-import { MimeType } from "../../interfaces/file.interface";
+import type { MimeType } from "../../interfaces/file.interface";
 import { MinFileSize } from "../../validators/minFileSize.decorator";
 import { FileData } from "../../classes/FileData";
 
@@ -28,7 +28,7 @@ describe("MaxFileSize", () => {
       "png",
       fileSize,
       "hash",
-      Buffer.from("test")
+      Buffer.from("test"),
     );
   };
 

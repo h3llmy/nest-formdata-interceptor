@@ -1,4 +1,4 @@
-import { PutObjectCommandInput, S3ClientConfig } from "@aws-sdk/client-s3";
+import type { PutObjectCommandInput, S3ClientConfig } from "@aws-sdk/client-s3";
 import { FileData } from "../classes/FileData";
 
 /**

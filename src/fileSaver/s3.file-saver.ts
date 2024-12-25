@@ -1,18 +1,29 @@
-import { ExecutionContext, InternalServerErrorException } from "@nestjs/common";
+import { InternalServerErrorException } from "@nestjs/common";
 import { FileData } from "../classes/FileData";
-import {
+import type {
   IS3FileSaverOptions,
   S3FileDataOptions,
 } from "../interfaces/s3-file.interface";
-import {
-  PutObjectCommand,
-  PutObjectCommandInput,
-  S3Client,
-} from "@aws-sdk/client-s3";
-import { IFileSaver } from "../interfaces/file.interface";
+import type { ExecutionContext } from "@nestjs/common";
+import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
+import type { IFileSaver } from "../interfaces/file.interface";
+
+let S3Client: typeof import("@aws-sdk/client-s3").S3Client;
+let PutObjectCommand: typeof import("@aws-sdk/client-s3").PutObjectCommand;
+
+try {
+  // Dynamically import the S3 package
+  const s3 = require("@aws-sdk/client-s3");
+  S3Client = s3.S3Client;
+  PutObjectCommand = s3.PutObjectCommand;
+} catch (error) {
+  // Gracefully handle the absence of the S3 package
+  S3Client = null;
+  PutObjectCommand = null;
+}
 
 export class S3FileSaver implements IFileSaver {
-  private readonly s3Client: S3Client;
+  private readonly s3Client: import("@aws-sdk/client-s3").S3Client;
 
   /**
    * Initializes a new instance of the S3FileSaver class.
@@ -20,6 +31,11 @@ export class S3FileSaver implements IFileSaver {
    * @param fileUploadOptions - configuration options for S3 file uploads.
    */
   constructor(private readonly fileUploadOptions: IS3FileSaverOptions) {
+    if (!S3Client) {
+      throw new Error(
+        "AWS SDK for S3 is not installed. Please install @aws-sdk/client-s3 to use this functionality.",
+      );
+    }
     this.s3Client = new S3Client(fileUploadOptions);
   }
 
@@ -37,6 +53,12 @@ export class S3FileSaver implements IFileSaver {
     context: ExecutionContext,
     options?: S3FileDataOptions,
   ): Promise<string> {
+    if (!S3Client || !PutObjectCommand) {
+      throw new Error(
+        "AWS SDK for S3 is not installed. Please install @aws-sdk/client-s3 to use this functionality.",
+      );
+    }
+
     const params: PutObjectCommandInput = {
       Bucket: options?.Bucket ?? this.fileUploadOptions?.bucket,
       Key: fileData.fileNameFull,
@@ -52,13 +74,9 @@ export class S3FileSaver implements IFileSaver {
     const command = new PutObjectCommand(params);
     await this.s3Client.send(command);
 
-    const s3Endpoint = await this.s3Client.config.endpoint();
-
     const fileUrl = this.fileUploadOptions.endpoint
-      ? `${this.fileUploadOptions.endpoint.toString()}${s3Endpoint.path}${
-          params.Bucket
-        }/${params.Key}`
-      : `https://${params.Bucket}.s3${this.fileUploadOptions.region}.amazonaws.com/${params.Key}`;
+      ? `${this.fileUploadOptions.endpoint}/${params.Bucket}/${params.Key}`
+      : `https://${params.Bucket}.s3.${this.fileUploadOptions.region}.amazonaws.com/${params.Key}`;
 
     return fileUrl;
   }
