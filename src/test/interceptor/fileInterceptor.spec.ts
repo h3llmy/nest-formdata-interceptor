@@ -1,6 +1,8 @@
 import { of } from "rxjs";
 import { FormdataInterceptor } from "../../interceptors/formdata.interceptor";
 import { CallHandler, ExecutionContext } from "@nestjs/common";
+import Busboy from "busboy";
+import busboy from "busboy";
 
 describe("FormdataInterceptor", () => {
   let interceptor: FormdataInterceptor;
@@ -34,6 +36,36 @@ describe("FormdataInterceptor", () => {
       .mockReturnValue(of({}));
     (await interceptor.intercept(executionContext, next)).subscribe();
     expect(spy).toHaveBeenCalled();
+  });
+
+  it("should handle form with optional file upload", async () => {
+
+    const boundary = "d1bf46b3-aa33-4061-b28d-6c5ced8b08ee";
+    mockRequest.headers = { "content-type": `multipart/form-data; boundary=${boundary}` };
+    mockRequest.body = [
+      "\r\n--d1bf46b3-aa33-4061-b28d-6c5ced8b08ee\r\n",
+      "Content-Type: application/octet-stream\r\n"
+      + "Content-Disposition: form-data; name=batch-1; filename=\"\""
+      + "\r\n\r\n",
+      "\r\n--d1bf46b3-aa33-4061-b28d-6c5ced8b08ee--",
+    ];
+    // @ts-ignore
+    mockRequest.pipe = ( busboy) =>{
+      // @ts-ignore
+      for (const src of mockRequest.body) {
+        const buf = (typeof src === 'string' ? Buffer.from(src, 'utf8') : src);
+        busboy.write(buf);
+      }
+    }
+    const observer = {
+      next: x => console.log('Observer got a next value: ' + x),
+      error: err => console.error('Observer got an error: ' + err),
+      complete: () => console.log('Observer got a complete notification'),
+    };
+
+    (await interceptor.intercept(executionContext, next)).subscribe();
+
+
   });
 
   it("should not call handleMultipartFormData if content type is not multipart/form-data", async () => {

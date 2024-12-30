@@ -96,6 +96,10 @@ export class FormdataInterceptor implements NestInterceptor {
         });
 
         fileStream.on("end", async () => {
+          if(fileInfo.filename === undefined && fileInfo.mimeType === "application/octet-stream"){
+            this.handleField(files, fieldName, undefined);
+            return
+          }
           const hash = crypto.createHash("md5");
           const fileBuffer: Buffer = Buffer.concat(bufferChunks);
           const fileExtension = fileInfo.filename.split(".").pop();
