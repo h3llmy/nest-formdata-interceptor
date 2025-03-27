@@ -32,7 +32,7 @@ describe("HasMimeType", () => {
       "png",
       10000,
       "hash",
-      Buffer.from("test")
+      Buffer.from("test"),
     );
   };
 

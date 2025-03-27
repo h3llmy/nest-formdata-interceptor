@@ -48,7 +48,7 @@ class MinFileSizeConstraint implements ValidatorConstraintInterface {
  */
 export function MinFileSize(
   minSize: number,
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
   return (object: object, propertyName: string) => {
     registerDecorator({

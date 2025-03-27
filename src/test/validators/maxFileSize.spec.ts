@@ -28,7 +28,7 @@ describe("MaxFileSize", () => {
       "png",
       fileSize,
       "hash",
-      Buffer.from("test")
+      Buffer.from("test"),
     );
   };
 
