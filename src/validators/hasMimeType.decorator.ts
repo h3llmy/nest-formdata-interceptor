@@ -40,10 +40,10 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
    * @param type The mimetype to check against the allowed types.
    * @returns A boolean indicating whether the mimetype matches any of the allowed types.
    */
-  private matchesWildcard(mimeType: (MimeType | string)[], type: string) {
+  private matchesWildcard(mimeType?: (MimeType | string)[], type?: string) {
     return mimeType.some((allowedType) => {
-      if (allowedType.endsWith("/*")) {
-        return type.startsWith(allowedType.slice(0, -2));
+      if (allowedType?.endsWith("/*")) {
+        return type?.startsWith(allowedType.slice(0, -2));
       }
       return type === allowedType;
     });

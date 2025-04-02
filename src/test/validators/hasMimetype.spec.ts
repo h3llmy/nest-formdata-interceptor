@@ -1,4 +1,4 @@
-import { validate, IsDefined } from "class-validator";
+import { validate, IsDefined, IsOptional } from "class-validator";
 import { MimeType } from "../../interfaces/file.interface";
 import { HasMimeType } from "../../validators/hasMimeType.decorator";
 import { FileData } from "../../classes/FileData";
@@ -7,6 +7,12 @@ class TestSingleFileClass {
   @IsDefined()
   @HasMimeType(["image/jpeg", "image/png"])
   file: FileData;
+}
+
+class TestSingleFileOptionalClass {
+  @IsOptional()
+  @HasMimeType(["image/*"])
+  file?: FileData;
 }
 
 class TestingGenericFileClass {
@@ -55,6 +61,22 @@ describe("HasMimeType", () => {
   it("should fail validation single file with allowed generic mimetype", async () => {
     const instance = new TestingGenericFileClass();
     instance.file = createFileData("video/mp4");
+
+    const errors = await validate(instance);
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0].constraints).toHaveProperty("HasMimeTypeConstraint");
+  });
+
+  it("should success validation optional file with no file", async () => {
+    const instance = new TestSingleFileOptionalClass();
+
+    const errors = await validate(instance);
+    expect(errors.length).toBe(0);
+  });
+
+  it("should fail validation optional file with wrong mimetype", async () => {
+    const instance = new TestSingleFileOptionalClass();
+    instance.file = createFileData("application/pdf");
 
     const errors = await validate(instance);
     expect(errors.length).toBeGreaterThan(0);
