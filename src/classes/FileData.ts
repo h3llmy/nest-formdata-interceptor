@@ -13,7 +13,7 @@ export class FileData<ReturnType = string, SavePayloadType = void> {
     public fileExtension: string,
     public fileSize: number,
     public hash: string,
-    public buffer: Buffer
+    public buffer: Buffer,
   ) {}
 
   /**

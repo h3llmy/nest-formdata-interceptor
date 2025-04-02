@@ -48,7 +48,7 @@ class MaxFileSizeConstraint implements ValidatorConstraintInterface {
  */
 export function MaxFileSize(
   maxSize: number,
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
   return (object: object, propertyName: string) => {
     registerDecorator({

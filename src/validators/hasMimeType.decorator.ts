@@ -22,12 +22,12 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
   public validate(value: FileData, args: ValidationArguments) {
     const [mimeType, option] = args.constraints as [
       (MimeType | string)[],
-      ValidationOptions
+      ValidationOptions,
     ];
 
     if (option?.each && Array.isArray(value)) {
       return value.every((item: FileData) =>
-        this.matchesWildcard(mimeType, item.mimetype)
+        this.matchesWildcard(mimeType, item.mimetype),
       );
     } else {
       return this.matchesWildcard(mimeType, value?.mimetype);
@@ -40,10 +40,10 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
    * @param type The mimetype to check against the allowed types.
    * @returns A boolean indicating whether the mimetype matches any of the allowed types.
    */
-  private matchesWildcard(mimeType: (MimeType | string)[], type: string) {
+  private matchesWildcard(mimeType?: (MimeType | string)[], type?: string) {
     return mimeType.some((allowedType) => {
-      if (allowedType.endsWith("/*")) {
-        return type.startsWith(allowedType.slice(0, -2));
+      if (allowedType?.endsWith("/*")) {
+        return type?.startsWith(allowedType.slice(0, -2));
       }
       return type === allowedType;
     });
@@ -57,7 +57,7 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
   public defaultMessage(args: ValidationArguments) {
     const [mimeType, option] = args.constraints as [
       (MimeType | string)[],
-      ValidationOptions
+      ValidationOptions,
     ];
 
     if (option?.each) {
@@ -76,7 +76,7 @@ class HasMimeTypeConstraint implements ValidatorConstraintInterface {
  */
 export function HasMimeType(
   mimeType: (MimeType | string)[],
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
   return (object: object, propertyName: string) => {
     registerDecorator({
