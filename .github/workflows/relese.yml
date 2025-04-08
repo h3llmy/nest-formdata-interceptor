@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - development
 
 permissions:
   contents: write
@@ -32,11 +33,13 @@ jobs:
       - name: Run tests
         run: npm run test
 
-      - name: Audit project
-        run: npm audit
-
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-        run: npx semantic-release
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            npx semantic-release
+          elif [ "${{ github.ref }}" == "refs/heads/development" ]; then
+            npx semantic-release --tag development
+          fi

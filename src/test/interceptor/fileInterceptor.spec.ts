@@ -1,6 +1,6 @@
 import { of } from "rxjs";
 import { FormdataInterceptor } from "../../interceptors/formdata.interceptor";
-import { CallHandler, ExecutionContext } from "@nestjs/common";
+import type { CallHandler, ExecutionContext } from "@nestjs/common";
 
 describe("FormdataInterceptor", () => {
   let interceptor: FormdataInterceptor;
@@ -82,9 +82,9 @@ describe("FormdataInterceptor", () => {
 
   it("should handle nested fields correctly", async () => {
     const target = {};
-    const fieldname = "user[address][city]";
+    const fieldName = "user[address][city]";
     const value = "New York";
-    interceptor["handleField"](target, fieldname, value);
+    interceptor["handleField"](target, fieldName, value);
 
     expect(target).toEqual({
       user: {
@@ -97,11 +97,11 @@ describe("FormdataInterceptor", () => {
 
   it("should handle array fields correctly", async () => {
     const target = {};
-    const fieldname = "tags[]";
+    const fieldName = "tags[]";
     const value1 = "tag1";
     const value2 = "tag2";
-    interceptor["handleField"](target, fieldname, value1);
-    interceptor["handleField"](target, fieldname, value2);
+    interceptor["handleField"](target, fieldName, value1);
+    interceptor["handleField"](target, fieldName, value2);
 
     expect(target).toEqual({
       tags: ["tag1", "tag2"],

@@ -1,16 +1,37 @@
 import { FileData } from "../classes/FileData";
-import {
-  registerDecorator,
+import type {
   ValidationArguments,
   ValidationOptions,
-  ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
+
+let registerDecorator: typeof import("class-validator").registerDecorator;
+let ValidatorConstraint: typeof import("class-validator").ValidatorConstraint;
+let ValidatorConstraintInterface: import("class-validator").ValidatorConstraintInterface;
+let ValidationArguments: import("class-validator").ValidationArguments;
+let ValidationOptions: import("class-validator").ValidationOptions;
+
+try {
+  // Dynamically import class-validator
+  const classValidator = require("class-validator");
+  registerDecorator = classValidator.registerDecorator;
+  ValidatorConstraint = classValidator.ValidatorConstraint;
+  ValidatorConstraintInterface = classValidator.ValidatorConstraintInterface;
+  ValidationArguments = classValidator.ValidationArguments;
+  ValidationOptions = classValidator.ValidationOptions;
+} catch (error) {
+  // Graceful fallback if class-validator is not installed
+  registerDecorator = null;
+  ValidatorConstraint = null;
+  ValidatorConstraintInterface = null;
+  ValidationArguments = null;
+  ValidationOptions = null;
+}
 
 /**
  * Validator constraint to check if the value is an instance of FileData or, if the `each` option is true, an array of instances of FileData.
  */
-@ValidatorConstraint({ async: false })
+@(ValidatorConstraint?.({ async: false }))
 class IsFileDataConstraint implements ValidatorConstraintInterface {
   /**
    * Validates if the value is an instance of FileData or an array of instances of FileData when `each` option is true.
@@ -50,6 +71,12 @@ class IsFileDataConstraint implements ValidatorConstraintInterface {
  * @returns A property decorator function.
  */
 export function IsFileData(validationOptions?: ValidationOptions) {
+  if (!registerDecorator || !ValidatorConstraint) {
+    throw new Error(
+      "class-validator is not installed. Please install class-validator to use this functionality.",
+    );
+  }
+
   return (object: object, propertyName: string) => {
     registerDecorator({
       target: object.constructor,

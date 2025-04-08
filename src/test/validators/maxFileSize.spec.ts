@@ -1,5 +1,5 @@
 import { validate, IsDefined } from "class-validator";
-import { MimeType } from "../../interfaces/file.interface";
+import type { MimeType } from "../../interfaces/file.interface";
 import { MaxFileSize } from "../../validators/maxFileSize.decorator";
 import { FileData } from "../../classes/FileData";
 

@@ -1,17 +1,38 @@
 import { FileData } from "../classes/FileData";
-import { MimeType } from "../interfaces/file.interface";
-import {
-  registerDecorator,
+import type { MimeType } from "../interfaces/file.interface";
+import type {
   ValidationArguments,
   ValidationOptions,
-  ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
+
+let registerDecorator: typeof import("class-validator").registerDecorator;
+let ValidatorConstraint: typeof import("class-validator").ValidatorConstraint;
+let ValidatorConstraintInterface: import("class-validator").ValidatorConstraintInterface;
+let ValidationArguments: import("class-validator").ValidationArguments;
+let ValidationOptions: import("class-validator").ValidationOptions;
+
+try {
+  // Dynamically import class-validator
+  const classValidator = require("class-validator");
+  registerDecorator = classValidator.registerDecorator;
+  ValidatorConstraint = classValidator.ValidatorConstraint;
+  ValidatorConstraintInterface = classValidator.ValidatorConstraintInterface;
+  ValidationArguments = classValidator.ValidationArguments;
+  ValidationOptions = classValidator.ValidationOptions;
+} catch (error) {
+  // Graceful fallback if class-validator is not installed
+  registerDecorator = null;
+  ValidatorConstraint = null;
+  ValidatorConstraintInterface = null;
+  ValidationArguments = null;
+  ValidationOptions = null;
+}
 
 /**
  * Custom validator constraint to check if the mimetype of a FileData object matches the specified types.
  */
-@ValidatorConstraint({ async: false })
+@(ValidatorConstraint?.({ async: false }))
 class HasMimeTypeConstraint implements ValidatorConstraintInterface {
   /**
    * Validates if the mimetype of the provided FileData object matches the specified types.
@@ -78,6 +99,12 @@ export function HasMimeType(
   mimeType: (MimeType | string)[],
   validationOptions?: ValidationOptions,
 ) {
+  if (!registerDecorator || !ValidatorConstraint) {
+    throw new Error(
+      "class-validator is not installed. Please install class-validator to use this functionality.",
+    );
+  }
+
   return (object: object, propertyName: string) => {
     registerDecorator({
       target: object.constructor,

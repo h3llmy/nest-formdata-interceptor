@@ -1,4 +1,4 @@
-import { MimeType } from "../interfaces/file.interface";
+import type { MimeType } from "../interfaces/file.interface";
 
 /**
  * Represents the data for a file upload.
