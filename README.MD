@@ -28,7 +28,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
 import {
   FormdataInterceptor,
-  DefaultFileSaver,
+  LocalFileSaver,
 } from "nestjs-formdata-interceptor";
 
 async function bootstrap() {
@@ -39,13 +39,13 @@ async function bootstrap() {
       customFileName(context, originalFileName) {
         return `${Date.now()}-${originalFileName}`;
       },
-      fileSaver: new DefaultFileSaver({
+      fileSaver: new LocalFileSaver({
         prefixDirectory: "./public",
         customDirectory(context, originalDirectory) {
           return originalDirectory;
         },
       }),
-    })
+    }),
   );
 
   await app.listen(3000);
@@ -66,14 +66,14 @@ import {
 } from "@nestjs/platform-fastify";
 import fastifyMultipart from "@fastify/multipart";
 import {
-  DefaultFileSaver,
+  LocalFileSaver,
   FormdataInterceptor,
 } from "nestjs-formdata-interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter()
+    new FastifyAdapter(),
   );
   app.register(fastifyMultipart);
 
@@ -82,13 +82,13 @@ async function bootstrap() {
       customFileName(context, originalFileName) {
         return `${Date.now()}-${originalFileName}`;
       },
-      fileSaver: new DefaultFileSaver({
+      fileSaver: new LocalFileSaver({
         prefixDirectory: "./public",
         customDirectory(context, originalDirectory) {
           return originalDirectory;
         },
       }),
-    })
+    }),
   );
 
   await app.listen(3000);
@@ -126,7 +126,7 @@ The `customFileName` function allows you to generate custom file names for each 
 
 #### 2. File Saver:
 
-- The `DefaultFileSaver` is used to define the directory where the files will be saved.
+- The `LocalFileSaver` is used to define the directory where the files will be saved.
 
   - `prefixDirectory` specifies the root directory where all files will be saved.
   - `customDirectory` allows you to specify a custom sub-directory within the root directory. By default, it uses the original directory provided.
@@ -143,7 +143,7 @@ export class CustomFileSaver implements IFileSaver {
   public save(
     fileData: FileData,
     context: ExecutionContext,
-    args: unknown // this will be get from save method payload
+    args: unknown, // this will be get from save method payload
   ): any {
     // do your file save logic
     // and return the file save data
@@ -169,7 +169,7 @@ async function bootstrap() {
         return `${Date.now()}-${originalFileName}`;
       },
       fileSaver: new CustomFileSaver(),
-    })
+    }),
   );
 
   await app.listen(3000);
@@ -185,6 +185,7 @@ If you are using [`class-validator`](https://www.npmjs.com/package/class-validat
 import { IsArray, IsNotEmpty } from "class-validator";
 import {
   FileData,
+  LocalFileData,
   HasMimeType,
   IsFileData,
   MaxFileSize,
@@ -200,7 +201,7 @@ export class CreateDto {
   @MinFileSize(2000000, { each: true })
   @MaxFileSize(4000000, { each: true })
   // array file
-  files: FileData[];
+  files: LocalFileData[];
 
   @IsFileData()
   @IsNotEmpty()
@@ -208,7 +209,7 @@ export class CreateDto {
   @MinFileSize(2000000)
   @MaxFileSize(4000000)
   // single file
-  file: FileData;
+  file: LocalFileData;
 
   @IsFileData()
   @IsNotEmpty()
@@ -241,6 +242,9 @@ export class AppController {
   async getHello(@Body() createDto: CreateDto) {
     // save single file
     createDto.file.save(); // by default the file save data type is string
+
+    // custom the file path on save function
+    createDto.file.save({ path: "/custom-path" }); // This path will be appended to the prefix directory if it is set.
 
     // save multiple file
     createDto.files.map((file) => file.save()); // by default the file save data type is string
