@@ -218,6 +218,7 @@ export interface IFileOptions {
 
 /**
  * Options for customizing behavior of the DefaultFileSaver.
+ * @deprecated Use ILocalFileSaverOptions instead.
  */
 export interface DefaultFileSaverOptions {
   /**
@@ -271,3 +272,45 @@ export type S3FileDataOptions = Omit<
  * @property {S3FileDataOptions | void} Optional S3-specific file data options.
  */
 export type S3FileData = FileData<Promise<string>, S3FileDataOptions | void>;
+
+/**
+ * Options for configuring the LocalFileSaver.
+ */
+export interface ILocalFileSaverOptions {
+  /**
+   * The directory where files will be saved.
+   * If not provided, it should be specified in the save method options.
+   */
+  path?: string;
+}
+
+/**
+ * Represents the file data structure specific to local storage operations.
+ *
+ * @typedef {FileData<string, ILocalFileSaverOptions | void>} LocalFileData
+ * @extends {FileData}
+ *
+ * @property {string} The file path where the file was saved.
+ * @property {ILocalFileSaverOptions | void} Optional local-specific file data options.
+ */
+export type LocalFileData = FileData<string, ILocalFileSaverOptions | void>;
+
+/**
+ * Options for customizing behavior of the LocalFileSaver.
+ */
+export interface ILocalFileSaverOptions {
+  /**
+   * Prefix directory where files will be saved.
+   */
+  prefixDirectory?: string;
+  /**
+   * Function to customize the directory where files will be saved.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param originalDirectory - The original directory.
+   * @returns The customized directory.
+   */
+  customDirectory?: (
+    context: ExecutionContext,
+    originalDirectory: string,
+  ) => string;
+}
