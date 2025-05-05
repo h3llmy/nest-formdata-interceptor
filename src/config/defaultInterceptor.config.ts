@@ -1,7 +1,7 @@
-import { DefaultFileSaver } from "../fileSaver/default.file-saver";
+import { LocalFileSaver } from "../fileSaver/local.file-saver";
 import { IFileOptions } from "../interfaces/file.interface";
 
 export const DEFAULT_INTERCEPTOR_CONFIG: IFileOptions = {
-  fileSaver: new DefaultFileSaver(),
+  fileSaver: new LocalFileSaver(),
   requestFileLocation: "body",
 };
