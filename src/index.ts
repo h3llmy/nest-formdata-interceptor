@@ -11,3 +11,4 @@ export * from "./fileSaver/s3.file-saver";
 export * from "./fileSaver/local.file-saver";
 
 export * from "./classes/FileData";
+export * from "./classes/MultipleFileData";

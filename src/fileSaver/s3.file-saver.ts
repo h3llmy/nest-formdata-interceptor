@@ -24,6 +24,21 @@ export class S3FileSaver implements IFileSaver {
   }
 
   /**
+   * Saves multiple files to S3.
+   * This method is a wrapper around the map method of the array.
+   * It takes an array of FileData and maps each file to its save method.
+   * The result is an array of strings, where each string is the file path
+   * where the respective file was saved.
+   * @param fileData - The array of file data to save.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param args - Optional payload sent to save method.
+   * @returns An array of file paths where the files were saved.
+   */
+  saveMany(fileData: FileData[], context: ExecutionContext, args?: unknown) {
+    throw new Error("Method not implemented.");
+  }
+
+  /**
    * Saves the provided file data to an S3 bucket.
    * Constructs the S3 object parameters and sends a PutObjectCommand to S3.
    * @param fileData - The file data to be saved, including the buffer and metadata.

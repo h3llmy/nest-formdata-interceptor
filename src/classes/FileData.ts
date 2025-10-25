@@ -22,6 +22,6 @@ export class FileData<ReturnType = string, SavePayloadType = void> {
    * @returns the file path where the file was saved
    */
   save(args: SavePayloadType): ReturnType {
-    return "" as ReturnType;
+    return undefined as ReturnType;
   }
 }
