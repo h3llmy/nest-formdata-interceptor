@@ -152,4 +152,50 @@ describe("LocalFileSaver", () => {
     );
     expect(result).toBe(mockFilePath);
   });
+
+  describe("saveMany", () => {
+    it("should call save() on each FileData and return file paths", () => {
+      const file1 = new FileData(
+        "a.txt",
+        "a",
+        "a.txt",
+        "7bit",
+        MimeType["text/plain"],
+        "txt",
+        10,
+        "hash",
+        Buffer.from("A"),
+      );
+      const file2 = new FileData(
+        "b.txt",
+        "b",
+        "b.txt",
+        "7bit",
+        MimeType["text/plain"],
+        "txt",
+        10,
+        "hash",
+        Buffer.from("B"),
+      );
+
+      const saveSpy1 = jest.spyOn(file1, "save").mockReturnValue("path/a.txt");
+      const saveSpy2 = jest.spyOn(file2, "save").mockReturnValue("path/b.txt");
+
+      const result = fileSaver.saveMany(
+        [file1, file2],
+        mockExecutionContext,
+        {},
+      );
+
+      expect(saveSpy1).toHaveBeenCalled();
+      expect(saveSpy2).toHaveBeenCalled();
+      expect(result).toEqual(["path/a.txt", "path/b.txt"]);
+      expect(result.length).toEqual(2);
+    });
+
+    it("should return empty array if fileData is empty", () => {
+      const result = fileSaver.saveMany([], mockExecutionContext);
+      expect(result).toEqual([]);
+    });
+  });
 });

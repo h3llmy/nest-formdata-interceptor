@@ -1,6 +1,9 @@
 import { of } from "rxjs";
 import { FormdataInterceptor } from "../../interceptors/formdata.interceptor";
 import { CallHandler, ExecutionContext } from "@nestjs/common";
+import { FileData } from "../../classes/FileData";
+import { MimeType } from "../../interfaces/file.interface";
+import { MultipleFileData } from "../../classes/MultipleFileData";
 
 describe("FormdataInterceptor", () => {
   let interceptor: FormdataInterceptor;
@@ -106,5 +109,60 @@ describe("FormdataInterceptor", () => {
     expect(target).toEqual({
       tags: ["tag1", "tag2"],
     });
+  });
+
+  it("should handle file fields correctly", async () => {
+    const target = {};
+    const fieldname = "file";
+    const fileData = new FileData(
+      "image.png",
+      "image.png",
+      "image.png",
+      "7bit",
+      MimeType["image/png"],
+      "png",
+      10000,
+      "hash",
+      Buffer.from("test"),
+    );
+    interceptor["handleFileField"](target, fieldname, fileData);
+
+    expect(target).toEqual({
+      file: fileData,
+    });
+  });
+
+  it("should handle multiple file fields correctly", async () => {
+    const target: Record<string, FileData | MultipleFileData> = {};
+    const fieldname = "files[]";
+    const fileData1 = new FileData(
+      "image.png",
+      "image.png",
+      "image.png",
+      "7bit",
+      MimeType["image/png"],
+      "png",
+      10000,
+      "hash",
+      Buffer.from("test"),
+    );
+    const fileData2 = new FileData(
+      "image.png",
+      "image.png",
+      "image.png",
+      "7bit",
+      MimeType["image/png"],
+      "png",
+      10000,
+      "hash",
+      Buffer.from("test"),
+    );
+    interceptor["handleFileField"](target, fieldname, fileData1);
+    interceptor["handleFileField"](target, fieldname, fileData2);
+
+    expect(target).toEqual({
+      files: [fileData1, fileData2],
+    });
+    expect(target.files).toBeInstanceOf(MultipleFileData);
   });
 });
