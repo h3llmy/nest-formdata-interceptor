@@ -57,9 +57,11 @@
     ]
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.917.0",
     "@types/busboy": "^1.5.4",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.9.1",
+    "class-validator": "^0.14.2",
     "jest": "^30.2.0",
     "semantic-release": "^25.0.1",
     "ts-jest": "^29.4.5",
