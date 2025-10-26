@@ -24,40 +24,84 @@ export class S3FileSaver implements IFileSaver {
   }
 
   /**
-   * Saves the provided file data to an S3 bucket.
-   * Constructs the S3 object parameters and sends a PutObjectCommand to S3.
-   * @param fileData - The file data to be saved, including the buffer and metadata.
+   * Uploads the provided file data to S3.
+   * @param file - The file data to upload.
+   * @param options - Optional S3-specific file data options.
+   * @returns A promise that resolves to the URL of the uploaded file.
+   * @throws InternalServerErrorException if the bucket is not provided.
+   */
+  private async uploadToS3(
+    file: FileData,
+    options?: S3FileDataOptions,
+  ): Promise<string> {
+    const bucket = options?.Bucket ?? this.fileUploadOptions.bucket;
+    if (!bucket) throw new InternalServerErrorException(`Bucket is required`);
+
+    const params: PutObjectCommandInput = {
+      Bucket: bucket,
+      Key: file.fileNameFull,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ...options,
+    };
+
+    await this.s3Client.send(new PutObjectCommand(params));
+
+    return this.fileUploadOptions.endpoint
+      ? `${this.fileUploadOptions.endpoint}/${bucket}/${params.Key}`
+      : `https://${bucket}.s3.${this.fileUploadOptions.region}.amazonaws.com/${params.Key}`;
+  }
+
+  /**
+   * Uploads the provided file data to S3.
+   * @param fileData - The file data to upload.
    * @param context - The execution context, typically provided by NestJS.
-   * @param options - Optional S3-specific file data options, such as bucket and additional parameters.
-   * @returns A promise that resolves to the URL of the saved file in S3.
-   * @throws InternalServerErrorException if the S3 bucket is not specified.
+   * @param options - Optional S3-specific file data options.
+   * @returns A promise that resolves to the URL of the uploaded file.
    */
   async save(
     fileData: FileData,
     context: ExecutionContext,
     options?: S3FileDataOptions,
   ): Promise<string> {
-    const params: PutObjectCommandInput = {
-      Bucket: options?.Bucket ?? this.fileUploadOptions?.bucket,
-      Key: fileData.fileNameFull,
-      Body: fileData.buffer,
-      ContentType: fileData.mimetype,
-      ...options,
-    };
+    return this.uploadToS3(fileData, options);
+  }
 
-    if (!params?.Bucket) {
-      throw new InternalServerErrorException(`Bucket is required`);
-    }
+  /**
+   * Uploads multiple files to S3.
+   * This method is a wrapper around the map method of the array.
+   * It takes an array of FileData and maps each file to its save method.
+   * The result is an array of strings, where each string is the file path
+   * where the respective file was saved.
+   * @param files - The array of file data to save.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param options - Optional S3-specific file data options.
+   * @returns A promise that resolves to an array of file paths where the files were saved.
+   * @throws InternalServerErrorException if any of the files failed to upload.
+   */
+  async saveMany(
+    files: FileData[],
+    context: ExecutionContext,
+    options?: S3FileDataOptions,
+  ): Promise<string[]> {
+    if (!files?.length) return [];
 
-    const command = new PutObjectCommand(params);
-    await this.s3Client.send(command);
+    const results = await Promise.allSettled(
+      files.map((file) => this.uploadToS3(file, options)),
+    );
 
-    const s3Endpoint = await this.s3Client.config.endpoint();
+    const fileUrls: string[] = [];
+    const errors: string[] = [];
 
-    const fileUrl = this.fileUploadOptions.endpoint
-      ? `${this.fileUploadOptions.endpoint}${s3Endpoint.path}${params.Bucket}/${params.Key}`
-      : `https://${params.Bucket}.s3${this.fileUploadOptions.region}.amazonaws.com/${params.Key}`;
+    results.forEach((res, i) =>
+      res.status === "fulfilled"
+        ? fileUrls.push(res.value)
+        : errors.push(`File ${files[i].fileNameFull} failed: ${res.reason}`),
+    );
 
-    return fileUrl;
+    if (errors.length)
+      throw new InternalServerErrorException(errors.join("\n"));
+
+    return fileUrls;
   }
 }

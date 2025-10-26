@@ -148,6 +148,15 @@ export class CustomFileSaver implements IFileSaver {
     // do your file save logic
     // and return the file save data
   }
+
+  public saveMany(
+    fileData: FileData[],
+    context: ExecutionContext,
+    args?: unknown,
+  ): any {
+    // to your bulk save logic
+    // and return the file save data
+  }
 }
 ```
 
@@ -191,18 +200,10 @@ import {
   MaxFileSize,
   MimeType,
   MinFileSize,
+  MultipleFileData,
 } from "nestjs-formdata-interceptor";
 
 export class CreateDto {
-  @IsArray()
-  @IsNotEmpty()
-  @IsFileData({ each: true })
-  @HasMimeType([MimeType["video/mp4"], "image/png"], { each: true })
-  @MinFileSize(2000000, { each: true })
-  @MaxFileSize(4000000, { each: true })
-  // array file
-  files: LocalFileData[];
-
   @IsFileData()
   @IsNotEmpty()
   @HasMimeType([MimeType["video/mp4"], "image/png"])
@@ -210,6 +211,17 @@ export class CreateDto {
   @MaxFileSize(4000000)
   // single file
   file: LocalFileData;
+
+  @IsArray()
+  @IsNotEmpty()
+  @IsFileData({ each: true })
+  @HasMimeType([MimeType["video/mp4"], "image/png"], { each: true })
+  @MinFileSize(2000000, { each: true })
+  @MaxFileSize(4000000, { each: true })
+  // array file
+  // or you can use LocalFileData[] but it will lose bulkSave method
+  // this this type is extend from Array class so you can still use array build in method like map, filter, ..etc.
+  files: MultipleFileData<Promise<string>, string>;
 
   @IsFileData()
   @IsNotEmpty()
@@ -246,8 +258,11 @@ export class AppController {
     // custom the file path on save function
     createDto.file.save({ path: "/custom-path" }); // This path will be appended to the prefix directory if it is set.
 
-    // save multiple file
+    // save multiple file if you using LocalFileData[]
     createDto.files.map((file) => file.save()); // by default the file save data type is string
+
+    // save multiple file if you using MultipleFileData
+    createDto.files.bulkSave();
 
     // customize file data example
     await createDto.customizeFileData.save("bucket_name"); // it will be returning Promise<string>

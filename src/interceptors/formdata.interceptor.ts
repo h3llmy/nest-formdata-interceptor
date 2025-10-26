@@ -14,6 +14,7 @@ import {
 import { FileData } from "../classes/FileData";
 import { DEFAULT_INTERCEPTOR_CONFIG } from "../config/defaultInterceptor.config";
 import crypto from "crypto";
+import { MultipleFileData } from "../classes/MultipleFileData";
 
 /**
  * Interceptor to handle file uploads using Busboy.
@@ -41,7 +42,7 @@ export class FormdataInterceptor implements NestInterceptor {
    */
   public async intercept(
     context: ExecutionContext,
-    next: CallHandler
+    next: CallHandler,
   ): Promise<Observable<any>> {
     const { customFileName, fileSaver } = this.fileOptions;
     const ctx = context.switchToHttp();
@@ -56,7 +57,7 @@ export class FormdataInterceptor implements NestInterceptor {
         context,
         next,
         customFileName,
-        fileSaver
+        fileSaver,
       );
     }
 
@@ -77,13 +78,15 @@ export class FormdataInterceptor implements NestInterceptor {
     next: CallHandler,
     customFileName?: (
       context: ExecutionContext,
-      originalFileName: string
+      originalFileName: string,
     ) => Promise<string> | string,
-    fileSaver?: IFileSaver
+    fileSaver?: IFileSaver,
   ): Promise<Observable<any>> {
     return new Observable((observer) => {
       this.busboy = Busboy({ headers: this.httpRequest.headers });
-      const files: Record<string, FileData> = {};
+
+      // 👇 support arrays of files
+      const files: Record<string, FileData | MultipleFileData> = {};
       const fields: Record<string, any> = {};
 
       this.busboy.on("file", async (fieldName, fileStream, fileInfo) => {
@@ -96,10 +99,14 @@ export class FormdataInterceptor implements NestInterceptor {
         });
 
         fileStream.on("end", async () => {
-          if(fileInfo.filename === undefined && fileInfo.mimeType === "application/octet-stream"){
+          if (
+            fileInfo.filename === undefined &&
+            fileInfo.mimeType === MimeType["application/octet-stream"]
+          ) {
             this.handleField(files, fieldName, undefined);
-            return
+            return;
           }
+
           const hash = crypto.createHash("md5");
           const fileBuffer: Buffer = Buffer.concat(bufferChunks);
           const fileExtension = fileInfo.filename.split(".").pop();
@@ -107,9 +114,11 @@ export class FormdataInterceptor implements NestInterceptor {
             .split(".")
             .slice(0, -1)
             .join(".");
+
           const finalFileName = customFileName
             ? await customFileName(context, fileNameOnly)
             : fileNameOnly;
+
           const fullFileName = `${finalFileName}.${fileExtension}`;
 
           this.assignFile(fileSaver, context);
@@ -123,10 +132,10 @@ export class FormdataInterceptor implements NestInterceptor {
             fileExtension,
             fileSize,
             hash.update(fileBuffer).digest("hex"),
-            fileBuffer
+            fileBuffer,
           );
 
-          this.handleField(files, fieldName, fileData);
+          this.handleFileField(files, fieldName, fileData);
         });
 
         fileStream.on("error", (error) => {
@@ -178,9 +187,53 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param context - The execution context.
    */
   private assignFile(fileSaver: IFileSaver, context: ExecutionContext): void {
-    FileData.prototype.save = function (this: FileData, args: unknown) {
+    FileData.prototype.save = function (this: FileData, args?: unknown) {
       return fileSaver.save(this, context, args);
     };
+    MultipleFileData.prototype.bulkSave = function (
+      this: MultipleFileData,
+      args?: unknown,
+    ) {
+      return fileSaver.saveMany(this, context, args);
+    };
+  }
+
+  /**
+   * Handles a file field by adding FileData to the target object.
+   * Automatically uses MultipleFileData for array fields or multiple files with same name.
+   * @param target - The target object to set the field value.
+   * @param fieldName - The name of the field.
+   * @param fileData - The FileData to add.
+   */
+  private handleFileField(
+    target: Record<string, FileData | MultipleFileData>,
+    fieldName: string,
+    fileData: FileData,
+  ) {
+    const isArrayField = this.arrayRegexPattern.test(fieldName);
+    const cleanFieldName = fieldName.replace(this.arrayRegexPattern, "");
+
+    if (isArrayField) {
+      if (!target[cleanFieldName]) {
+        target[cleanFieldName] = new MultipleFileData(fileData);
+      } else if (target[cleanFieldName] instanceof MultipleFileData) {
+        (target[cleanFieldName] as MultipleFileData).push(fileData);
+      } else {
+        const existingFile = target[cleanFieldName] as FileData;
+        target[cleanFieldName] = new MultipleFileData(existingFile, fileData);
+      }
+    } else {
+      if (!target[fieldName]) {
+        target[fieldName] = fileData;
+      } else {
+        if (target[fieldName] instanceof MultipleFileData) {
+          (target[fieldName] as MultipleFileData).push(fileData);
+        } else {
+          const existingFile = target[fieldName] as FileData;
+          target[fieldName] = new MultipleFileData(existingFile, fileData);
+        }
+      }
+    }
   }
 
   /**
@@ -206,7 +259,7 @@ export class FormdataInterceptor implements NestInterceptor {
     obj: any,
     keys: string[],
     value: any,
-    isArray = false
+    isArray = false,
   ) {
     let current = obj;
 
@@ -216,9 +269,7 @@ export class FormdataInterceptor implements NestInterceptor {
       if (isLastKey) {
         this.assignValue(current, key, value, isArray);
       } else {
-        if (!current[key]) {
-          current[key] = {};
-        }
+        if (!current[key]) current[key] = {};
         current = current[key];
       }
     });
@@ -262,9 +313,7 @@ export class FormdataInterceptor implements NestInterceptor {
    * @param value - The value to set.
    */
   private assignArrayValue(obj: any, key: string, value: any) {
-    if (!Array.isArray(obj[key])) {
-      obj[key] = [];
-    }
+    if (!Array.isArray(obj[key])) obj[key] = [];
     obj[key].push(value);
   }
 }

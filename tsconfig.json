@@ -16,7 +16,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "baseUrl": ".",
     "esModuleInterop": true
   },
   "include": ["src/**/*.ts"],
