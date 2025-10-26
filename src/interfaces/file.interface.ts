@@ -187,6 +187,19 @@ export interface IFileSaver {
    * @returns The file path where the file was saved.
    */
   save(fileData: FileData, context: ExecutionContext, args?: unknown): any;
+
+  /**
+   * Saves the provided file data to the specified file path.
+   * @param fileData - The array of file data to save.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param args - Optional payload sent to save method.
+   * @returns The array of file paths where the files were saved.
+   */
+  saveMany(
+    fileData: FileData[],
+    context: ExecutionContext,
+    args?: unknown,
+  ): any;
 }
 
 /**
@@ -205,7 +218,7 @@ export interface IFileOptions {
   ) => Promise<string> | string;
   /**
    * Custom file saver implementation.
-   * @default DefaultFileSaver
+   * @default LocalFileSaver
    */
   fileSaver?: IFileSaver;
 

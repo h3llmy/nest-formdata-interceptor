@@ -22,6 +22,21 @@ export class LocalFileSaver implements IFileSaver {
   }
 
   /**
+   * Saves multiple files to the specified location.
+   * This method is a wrapper around the map method of the array.
+   * It takes an array of FileData and maps each file to its save method.
+   * The result is an array of strings, where each string is the file path
+   * where the respective file was saved.
+   * @param fileData - The array of file data to save.
+   * @param context - The execution context, typically provided by NestJS.
+   * @param args - Optional payload sent to the save method.
+   * @returns An array of file paths where the files were saved.
+   */
+  saveMany(fileData: FileData[], context: ExecutionContext, args?: unknown) {
+    return fileData.map((f) => f.save());
+  }
+
+  /**
    * Saves the provided file data to the specified file path.
    * Ensures the directory exists and writes the file buffer to the file path.
    * @param fileData - The file data to save.

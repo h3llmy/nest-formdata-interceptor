@@ -35,16 +35,13 @@ describe("S3FileSaver", () => {
   const defaultOptions: IS3FileSaverOptions = {
     region: "us-east-1",
     bucket: "mock-bucket",
-    endpoint: "https://custom-endpoint.com/",
+    endpoint: "https://custom-endpoint.com",
   };
 
   beforeEach(() => {
     mockS3ClientSend = jest.fn().mockResolvedValue({});
     (S3Client as jest.Mock).mockImplementation(() => ({
       send: mockS3ClientSend,
-      config: {
-        endpoint: jest.fn().mockResolvedValue({ path: "/" }),
-      },
     }));
 
     (PutObjectCommand as unknown as jest.Mock).mockImplementation(
@@ -61,7 +58,7 @@ describe("S3FileSaver", () => {
     jest.clearAllMocks();
   });
 
-  it("should upload file to S3 and return custom URL", async () => {
+  it("should upload file to S3 and return custom endpoint URL", async () => {
     const result = await fileSaver.save(mockFileData, mockExecutionContext);
 
     expect(PutObjectCommand).toHaveBeenCalledWith(
@@ -77,7 +74,7 @@ describe("S3FileSaver", () => {
       expect.objectContaining({ mockCommand: true }),
     );
 
-    expect(result).toBe("https://custom-endpoint.com//mock-bucket/test.jpg");
+    expect(result).toBe("https://custom-endpoint.com/mock-bucket/test.jpg");
   });
 
   it("should throw an exception if bucket is missing", async () => {
@@ -115,7 +112,40 @@ describe("S3FileSaver", () => {
     const result = await fileSaver.save(mockFileData, mockExecutionContext);
 
     expect(result).toBe(
-      "https://backup-bucket.s3us-west-2.amazonaws.com/test.jpg",
+      "https://backup-bucket.s3.us-west-2.amazonaws.com/test.jpg",
     );
+  });
+
+  describe("saveMany", () => {
+    it("should upload multiple files and return URLs", async () => {
+      const files = [mockFileData, mockFileData];
+      const results = await fileSaver.saveMany(files, mockExecutionContext);
+
+      expect(mockS3ClientSend).toHaveBeenCalledTimes(2);
+      expect(results).toEqual([
+        "https://custom-endpoint.com/mock-bucket/test.jpg",
+        "https://custom-endpoint.com/mock-bucket/test.jpg",
+      ]);
+    });
+
+    it("should handle mixed success and failure", async () => {
+      mockS3ClientSend
+        .mockResolvedValueOnce({})
+        .mockRejectedValueOnce(new Error("S3 upload failed"));
+
+      const files = [mockFileData, mockFileData];
+
+      await expect(
+        fileSaver.saveMany(files, mockExecutionContext),
+      ).rejects.toThrow(InternalServerErrorException);
+
+      expect(mockS3ClientSend).toHaveBeenCalledTimes(2);
+    });
+
+    it("should return empty array if no files provided", async () => {
+      const result = await fileSaver.saveMany([], mockExecutionContext);
+      expect(result).toEqual([]);
+      expect(mockS3ClientSend).not.toHaveBeenCalled();
+    });
   });
 });
