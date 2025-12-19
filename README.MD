@@ -26,10 +26,8 @@ To use `nestjs-formdata-interceptor`, import it into the main directory of your 
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
-import {
-  FormdataInterceptor,
-  LocalFileSaver,
-} from "nestjs-formdata-interceptor";
+import { FormdataInterceptor } from "nestjs-formdata-interceptor";
+import { LocalFileSaver } from "nestjs-formdata-interceptor/localFileSaver"
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -65,10 +63,8 @@ import {
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import fastifyMultipart from "@fastify/multipart";
-import {
-  LocalFileSaver,
-  FormdataInterceptor,
-} from "nestjs-formdata-interceptor";
+import { FormdataInterceptor } from "nestjs-formdata-interceptor";
+import { LocalFileSaver } from "nestjs-formdata-interceptor/localFileSaver"
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
