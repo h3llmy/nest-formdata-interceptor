@@ -191,13 +191,15 @@ import { IsArray, IsNotEmpty } from "class-validator";
 import {
   FileData,
   LocalFileData,
+  MultipleFileData,
+} from "nestjs-formdata-interceptor";
+import {
   HasMimeType,
   IsFileData,
   MaxFileSize,
   MimeType,
   MinFileSize,
-  MultipleFileData,
-} from "nestjs-formdata-interceptor";
+} from "nestjs-formdata-interceptor/validator";
 
 export class CreateDto {
   @IsFileData()
