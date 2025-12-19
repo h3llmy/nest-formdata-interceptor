@@ -56,15 +56,21 @@
       "**/*.test.ts"
     ]
   },
+  "exports": {
+    ".": "./dist/index.js",
+    "./s3FileSaver": "./dist/fileSaver/s3.file-saver.js",
+    "./defaultFileSaver": "./dist/fileSaver/default.file-saver.js",
+    "./localFileSaver": "./dist/fileSaver/local.file-saver.js"
+  },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.917.0",
+    "@aws-sdk/client-s3": "^3.955.0",
     "@types/busboy": "^1.5.4",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.9.1",
-    "class-validator": "^0.14.2",
+    "@types/node": "^25.0.3",
+    "class-validator": "^0.14.3",
     "jest": "^30.2.0",
-    "semantic-release": "^25.0.1",
-    "ts-jest": "^29.4.5",
+    "semantic-release": "^25.0.2",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3"
   },
   "dependencies": {
