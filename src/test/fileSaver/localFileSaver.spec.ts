@@ -197,5 +197,19 @@ describe("LocalFileSaver", () => {
       const result = fileSaver.saveMany([], mockExecutionContext);
       expect(result).toEqual([]);
     });
+
+    it("should implement file save options", () => {
+      const saveSpy = jest.spyOn(mockFileData, "save").mockReturnValue("/sub/folder/test.jpg");
+
+      const result = fileSaver.saveMany([mockFileData], mockExecutionContext, {
+        path: "/sub/folder",
+      } as ILocalFileSaverOptions);
+
+      expect(result.length).toEqual(1);
+      expect(saveSpy).toHaveBeenCalledWith({
+        path: "/sub/folder",
+      })
+      expect(result).toEqual(["/sub/folder/test.jpg"]);
+    })
   });
 });

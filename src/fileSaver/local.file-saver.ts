@@ -32,8 +32,8 @@ export class LocalFileSaver implements IFileSaver {
    * @param args - Optional payload sent to the save method.
    * @returns An array of file paths where the files were saved.
    */
-  saveMany(fileData: FileData[], context: ExecutionContext, args?: unknown) {
-    return fileData.map((f) => f.save());
+  saveMany(fileData: FileData<unknown, unknown>[], context: ExecutionContext, args?: unknown) {
+    return fileData.map((f) => f.save(args));
   }
 
   /**
