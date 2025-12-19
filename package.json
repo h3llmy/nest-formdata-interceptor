@@ -60,7 +60,8 @@
     ".": "./dist/index.js",
     "./s3FileSaver": "./dist/fileSaver/s3.file-saver.js",
     "./defaultFileSaver": "./dist/fileSaver/default.file-saver.js",
-    "./localFileSaver": "./dist/fileSaver/local.file-saver.js"
+    "./localFileSaver": "./dist/fileSaver/local.file-saver.js",
+    "./validator": "./dist/validators/index.js"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.955.0",
